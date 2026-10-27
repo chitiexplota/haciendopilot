@@ -1,0 +1,212 @@
+/* =========================
+   PÁGINA 03 — MAPA
+   (los colores, el logo y el menú vienen de style.css)
+========================= */
+
+body.pagina-mapa {
+   height: 100vh;
+   overflow: hidden;
+   font-family: 'Inter', Arial, sans-serif;
+   color: var(--dark);
+}
+
+#map {
+   position: fixed;
+   inset: 0;
+   height: 100vh;
+   width: 100%;
+   background: var(--blanco);
+   z-index: 1;
+}
+
+.leaflet-tile {
+   filter:
+      saturate(1.0)
+      contrast(1)
+      brightness(0.95);
+}
+
+
+/* BUSCADOR (debajo del menú 01 · 02 · 03) */
+#searchBox {
+   position: fixed;
+   top: 75px;
+   right: 20px;
+   z-index: 9999;
+   width: 240px;
+   padding: 10px 12px;
+   box-sizing: border-box;
+   border-radius: 8px;
+   border: 2px solid var(--dark);
+   outline: none;
+   font-family: 'Inter', Arial, sans-serif;
+   font-size: 14px;
+   color: var(--dark);
+   background: var(--blanco);
+}
+
+#searchBox:focus {
+   border-color: var(--azul);
+}
+
+#suggestions {
+   position: fixed;
+   top: 120px;
+   right: 20px;
+   z-index: 9999;
+   width: 240px;
+   background: var(--blanco);
+   border-radius: 8px;
+   overflow: hidden;
+   box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+   display: none;
+}
+
+.suggestion {
+   padding: 8px;
+   cursor: pointer;
+   font-size: 13px;
+   color: var(--dark);
+}
+
+.suggestion:hover {
+   background: var(--limon);
+}
+
+
+/* INSTRUCCIÓN */
+#info {
+   position: fixed;
+   bottom: 20px;
+   left: 20px;
+   z-index: 9999;
+   background: var(--dark);
+   color: var(--blanco);
+   padding: 10px 14px;
+   border-radius: 10px;
+   font-size: 14px;
+}
+
+
+/* BOTONES DEL MAPA */
+.zoomBtn {
+   position: fixed;
+   right: 20px;
+   bottom: 20px;
+   width: 44px;
+   height: 44px;
+   border-radius: 50%;
+   border: none;
+   background: var(--blanco);
+   color: var(--dark);
+   font-size: 22px;
+   font-weight: bold;
+   z-index: 9999;
+   cursor: pointer;
+   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+   transition: transform 0.2s ease;
+}
+
+.zoomBtn:hover {
+   transform: scale(1.08);
+}
+
+#zoomOut        { bottom: 70px; }
+#contrastToggle { bottom: 120px; background: var(--limon); }
+#listToggle     { bottom: 170px; background: var(--magenta); color: var(--blanco); }
+
+
+/* LISTA DE LUGARES */
+#pinList {
+   position: fixed;
+   top: 0;
+   right: 0;
+   width: 280px;
+   height: 100%;
+   padding: 20px;
+   box-sizing: border-box;
+   overflow-y: auto;
+   background: var(--blanco);
+   color: var(--dark);
+   z-index: 10001;
+   box-shadow: -6px 0 20px rgba(0,0,0,0.15);
+}
+
+#pinList .close-list-btn {
+   position: absolute;
+   top: 10px;
+   right: 10px;
+   width: 32px;
+   height: 32px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   border-radius: 50%;
+   background: none;
+   border: none;
+   font-size: 22px;
+   cursor: pointer;
+   color: var(--dark);
+}
+
+#pinList .list-description {
+   color: var(--azul);
+   font-size: 13px;
+   margin: 30px 0 12px 0;
+}
+
+.pin-item {
+   padding: 8px 0;
+   border-bottom: 1px solid rgba(0,0,0,0.1);
+   cursor: pointer;
+   font-size: 14px;
+}
+
+.pin-item:hover {
+   color: var(--azul);
+}
+
+
+/* POPUP */
+.leaflet-popup-content {
+   font-family: 'Inter', Arial, sans-serif;
+   color: var(--dark);
+}
+
+.popup-btn {
+   margin-top: 10px;
+   padding: 6px 14px;
+   border: none;
+   border-radius: 999px;
+   cursor: pointer;
+}
+
+.done-btn {
+   background: var(--dark);
+   color: var(--blanco);
+}
+
+.close-btn {
+   background: var(--blanco);
+   color: var(--dark);
+}
+
+.leaflet-popup-close-button {
+   left: 10px !important;
+   right: auto !important;
+}
+
+
+/* MÓVIL */
+@media (max-width: 600px) {
+   #searchBox,
+   #suggestions {
+      width: calc(100% - 40px);
+   }
+
+   #info {
+      bottom: 20px;
+      right: 80px;
+      font-size: 13px;
+   }
+}

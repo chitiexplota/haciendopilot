@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title data-i18n="title_collage">Haciendo.lab — Collage</title>
+
+
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+</head>
+
+
+<body class="pagina-collage">
+
+
+<a href="https://chitiexplota.github.io/haciendopilot/" id="logo-link">
+ <img src="logo.png" class="logo" alt="Logo">
+</a>
+<div id="logo-subtitle">Digital Urban Living Lab<br>MSc RePIC's Master Thesis</div>
+
+
+<!-- MENU -->
+<nav id="main-menu">
+<a href="index.html" class="menu-item" data-tooltip-pos="abajo" data-i18n-tooltip="tip_inicio">01</a>
+<a href="collage.html" class="menu-item active" data-tooltip-pos="abajo" data-i18n-tooltip="tip_collage">02</a>
+<a href="mapa.html" class="menu-item" data-tooltip-pos="abajo" data-i18n-tooltip="tip_mapa">03</a>
+<a href="info.html" class="menu-item" data-tooltip-pos="abajo" data-i18n-tooltip="tip_info">04</a>
+<div id="lang-switch" role="group" aria-label="Idioma">
+<button class="lang-btn" data-lang="es" data-tooltip-pos="abajo" data-i18n-tooltip="tip_es" aria-label="Castellano">ES</button>
+<button class="lang-btn" data-lang="ca" data-tooltip-pos="abajo" data-i18n-tooltip="tip_ca" aria-label="Català">CA</button>
+</div>
+</nav>
+
+
+<div id="fondos-fijos"></div>
+<div id="elementos-canvas"></div>
+
+
+<button id="enviar" data-i18n="enviar_collage" data-tooltip-pos="abajo" data-i18n-tooltip="tip_enviar">Enviar Collage</button>
+
+
+<button id="crayon-btn" data-i18n-tooltip="tip_dibujar" data-i18n-aria="tip_dibujar">
+<img src="images/crayon.png" alt="Crayon">
+</button>
+
+<button id="mover-btn" class="activo" data-i18n-tooltip="tip_mover" data-i18n-aria="tip_mover">
+<img src="images/hand.png" alt="Mover">
+</button>
+
+
+<div id="tools-menu">
+
+
+<button
+id="color-tool"
+class="tool-circle"
+data-i18n-tooltip="tip_color"
+data-i18n-aria="tip_color">
+
+
+<input
+id="color-picker"
+type="color"
+value="#000000">
+
+
+</button>
+
+
+<button
+id="text-tool"
+class="tool-circle"
+data-i18n-tooltip="tip_texto"
+data-i18n-aria="tip_texto">
+
+
+       Abc
+</button>
+
+
+<button
+id="eraser-tool"
+class="tool-circle"
+data-i18n-tooltip="tip_goma"
+data-i18n-aria="tip_goma">
+<img src="images/eraser.png">
+
+
+</button>
+
+
+</div>
+
+
+<div id="zona-dibujo">
+<canvas id="canvas"></canvas>
+<canvas id="text-canvas"></canvas>
+<canvas id="canvas-encima"></canvas>
+
+
+</div>
+
+
+<div id="galeria-wrapper">
+<div id="galeria-title" data-i18n="galeria_titulo">Últimos collages enviados</div>
+<div id="galeria"></div>
+</div>
+
+
+<div id="popup">
+<img id="popup-img">
+</div>
+
+
+<!-- BOTÓN SUGERIR -->
+<button id="sugerir-btn" data-tooltip-pos="derecha" data-i18n-tooltip="sugerir_title" data-i18n-aria="sugerir_title">
+<span>+</span>
+</button>
+
+
+<!-- POPUP SUGERENCIAS -->
+<div id="sugerir-popup">
+<div id="sugerir-popup-content">
+<button id="sugerir-close">&times;</button>
+<h3 data-i18n="sugerir_pregunta">¿Qué imágenes o elementos te gustaría ver en el collage?</h3>
+<div id="sugerencias-form">
+<input type="text" id="sugerencia-input" placeholder="Escribe tu sugerencia..." data-i18n-placeholder="sugerencia_placeholder">
+<button id="sugerencia-btn" data-i18n="sugerencia_enviar">Enviar</button>
+</div>
+<div id="sugerencias-lista"></div>
+</div>
+</div>
+
+
+<script type="module" src="script.js"></script>
+
+
+</body>
+</html>
