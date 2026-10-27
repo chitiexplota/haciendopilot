@@ -1,8 +1,24 @@
 /* =========================
    IDIOMAS (ES / CA)
-   - Los textos de la interfaz se traducen con data-i18n.
+   Todas las páginas cargan este archivo.
+
+   - Los textos del HTML se traducen con atributos:
+     data-i18n (texto) · data-i18n-placeholder · data-i18n-title
+     data-i18n-aria (aria-label) · data-i18n-tooltip (descripción al pasar el ratón)
+   - Los textos que crea el JavaScript usan t("clave").
    - Las aportaciones de los participantes (collages, sugerencias,
      mensajes del mapa) NO se traducen nunca.
+   - Para cambiar un texto, edita solo lo que hay entre comillas.
+
+   Índice
+   1. Textos (es / ca)
+   2. Idioma actual
+   3. Aplicar y cambiar idioma
+========================= */
+
+
+/* =========================
+   1. TEXTOS
 ========================= */
 
 const TEXTOS = {
@@ -85,7 +101,6 @@ const TEXTOS = {
       porque_mapa_titulo: "¿Por qué un mapa?",
       porque_mapa_p1: "El mapa colaborativo es una forma sencilla de contar cómo vivimos la ciudad. Cada punto del mapa guarda una experiencia, un recuerdo o una sensación ligada a un lugar concreto. Poco a poco, todas estas historias forman un archivo colectivo del espacio público, y el propio mapa muestra en qué lugares se acumulan más experiencias.",
       porque_mapa_p2: "Para este proyecto, el mapa es especialmente relevante porque pone muy fácil participar: basta con hacer clic, escribir y enviar, cuando quieras y desde donde quieras, sin tener que coincidir con nadie. Tu nombre no aparece nunca en el mapa, y lo que escribes se publica tal y como lo cuentas, sin que nadie lo interprete por ti. Así, el mapa ayuda a hacer visibles voces que a menudo se quedan fuera de los procesos de participación tradicionales.",
-      texto_pendiente: "[Texto pendiente]",
 
       /* DESCRIPCIONES AL PASAR EL RATÓN */
       tip_inicio: "Inicio",
@@ -180,7 +195,6 @@ const TEXTOS = {
       porque_mapa_titulo: "Per què un mapa?",
       porque_mapa_p1: "El mapa col·laboratiu és una manera senzilla d'explicar com vivim la ciutat. Cada punt del mapa guarda una experiència, un record o una sensació lligada a un lloc concret. A poc a poc, totes aquestes històries formen un arxiu col·lectiu de l'espai públic, i el mateix mapa mostra en quins llocs s'acumulen més experiències.",
       porque_mapa_p2: "Per a aquest projecte, el mapa és especialment rellevant perquè posa molt fàcil participar: només cal fer clic, escriure i enviar, quan vulguis i des d'on vulguis, sense haver de coincidir amb ningú. El teu nom no apareix mai al mapa, i el que escrius es publica tal com ho expliques, sense que ningú ho interpreti per tu. Així, el mapa ajuda a fer visibles veus que sovint queden fora dels processos de participació tradicionals.",
-      texto_pendiente: "[Text pendent]",
 
       /* DESCRIPCIONS EN PASSAR EL RATOLÍ */
       tip_inicio: "Inici",
@@ -199,7 +213,9 @@ const TEXTOS = {
 };
 
 
-/* IDIOMA ACTUAL (se recuerda entre páginas) */
+/* =========================
+   2. IDIOMA ACTUAL (se recuerda entre páginas)
+========================= */
 const CLAVE_IDIOMA = "haciendo-idioma";
 
 export function getIdioma() {
@@ -213,13 +229,17 @@ export function getIdioma() {
 let idioma = getIdioma();
 
 
-/* TRADUCIR UNA CLAVE (para los textos que crea el JS: alerts, popups, listas) */
+/* Traducir una clave (textos que crea el JS: avisos, popups, listas) */
 export function t(clave) {
    return TEXTOS[idioma][clave] ?? TEXTOS.es[clave] ?? clave;
 }
 
 
-/* APLICAR LAS TRADUCCIONES A TODA LA PÁGINA */
+/* =========================
+   3. APLICAR Y CAMBIAR IDIOMA
+========================= */
+
+/* Aplicar las traducciones a toda la página (o a una parte) */
 export function aplicarTraducciones(raiz = document) {
 
    document.documentElement.lang = idioma;
@@ -252,7 +272,7 @@ export function aplicarTraducciones(raiz = document) {
 }
 
 
-/* CAMBIAR DE IDIOMA */
+/* Cambiar de idioma */
 export function setIdioma(nuevo) {
    idioma = nuevo === "ca" ? "ca" : "es";
 
@@ -267,7 +287,7 @@ export function setIdioma(nuevo) {
 }
 
 
-/* BOTONES ES / CA DEL MENÚ */
+/* Botones ES / CA del menú */
 document.querySelectorAll(".lang-btn").forEach(btn => {
    btn.addEventListener("click", () => setIdioma(btn.dataset.lang));
 });

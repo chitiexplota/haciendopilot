@@ -1,28 +1,47 @@
-# Haciendo.lab — Collage
+# Haciendo.lab — Piloto
 
-Módulo de collage colaborativo de la plataforma **Haciendo.lab**, herramienta digital para la participación ciudadana inclusiva y la producción de conocimiento cualitativo sobre el espacio público en la ciudad postindustrial (Barcelona).
+Plataforma web de **Haciendo.lab**: herramientas creativas para la participación ciudadana inclusiva y la producción de conocimiento cualitativo sobre el espacio público en la ciudad postindustrial (Barcelona). Etapa 1. PILOTO.
 
-Este prototipo permite expresar experiencias y percepciones sobre el espacio público a través de dibujo libre, imágenes arrastrables, letras y texto, como alternativa creativa y accesible a los métodos convencionales de participación. Cada creación se guarda en Firebase Firestore como imagen en base64.
+Web publicada: https://chitiexplota.github.io/haciendopilot/
 
-## Estructura de archivos
+## Páginas
 
-```
-index.html   → Estructura y contenido (HTML)
-style.css    → Todos los estilos (CSS)
-script.js    → Lógica de la aplicación y conexión con Firebase (JS, tipo módulo)
-```
+| Página | HTML | CSS | JS |
+|---|---|---|---|
+| 01 · Inicio | `index.html` | `style.css` | `i18n.js` |
+| 02 · Collage | `collage.html` | `style.css` + `collage.css` | `collage.js` |
+| 03 · Mapa | `mapa.html` | `style.css` + `mapa.css` | `mapa.js` |
+| 04 · Cómo participar | `info.html` | `style.css` + `info.css` | `info.js` |
 
-`index.html` enlaza los otros dos:
-```html
-<link rel="stylesheet" href="style.css">
-...
-<script type="module" src="script.js"></script>
-```
+## Archivos comunes
 
-El código interno de los tres archivos es idéntico al del `index.html` original; solo se ha movido a archivos separados, sin modificar ninguna línea, comentario o lógica.
+- **`style.css`**: colores, cabecera (logo, menú, idioma), botones de entrada, descripciones al pasar el ratón, página 01 y versión móvil de la cabecera.
+- **`i18n.js`**: textos en castellano y catalán, y selector ES / CA. Las aportaciones de los participantes no se traducen nunca.
+- **`logo.png`** y la carpeta **`images/`** (fotos, iconos y letras `images/abc/A.png` … `Z.png`).
 
-## Cómo usarlo
+## Versión móvil
 
-1. Sube los tres archivos (`index.html`, `style.css`, `script.js`) junto con la carpeta `images/` y el `logo.png` al mismo directorio en tu hosting.
-2. Verifica que la ruta `<base href="/Collage/">` coincide con la ruta real donde se sirve la página; si no, ajústala.
-3. Firebase ya está configurado con las credenciales del proyecto `ull-collage`; no requiere pasos adicionales para funcionar.
+Todas las páginas se adaptan a pantallas de hasta 700 px de ancho.
+En el collage, en móvil, todo cabe en una sola pantalla (lo que se ve es lo que se envía), y se puede mover, dibujar y escribir con el dedo.
+
+## Datos (Firebase Firestore)
+
+| Herramienta | Proyecto | Colecciones |
+|---|---|---|
+| Collage | `ull-collage` | `dibujos`, `sugerencias` |
+| Mapa | `digitalull` | `entries` |
+
+Copias de seguridad: repositorio privado `haciendo-backups`.
+
+## Normas del código
+
+- Comentarios y nombres en castellano.
+- Secciones con el mismo formato en CSS y JS:
+  ```
+  /* =========================
+     TÍTULO
+  ========================= */
+  ```
+  y en HTML: `<!-- TÍTULO -->`.
+- Indentación de 3 espacios.
+- Cada archivo empieza con un índice de sus secciones.

@@ -1,172 +1,82 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta name="robots" content="noindex, nofollow">
+   <title data-i18n="title_inicio">Haciendo.lab</title>
 
-<title data-i18n="title_inicio">Haciendo.lab</title>
-
-<link rel="stylesheet" href="style.css">
-
-<link
-href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
-rel="stylesheet">
-
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+   <link rel="stylesheet" href="style.css">
 </head>
 
-
-<body>
+<body class="pagina-inicio">
 
 
 <!-- LOGO -->
-
-<a
-href="https://chitiexplota.github.io/haciendopilot/"
-id="logo-link">
-
-<img
-src="logo.png"
-class="logo"
-alt="Logo">
-
+<a href="https://chitiexplota.github.io/haciendopilot/" id="logo-link">
+   <img src="logo.png" class="logo" alt="Haciendo.lab">
 </a>
+<div id="logo-subtitle">Digital Urban Living Lab<br>MSc RePIC's Master Thesis</div>
 
 
-<div id="logo-subtitle">
-Digital Urban Living Lab<br>
-MSc RePIC's Master Thesis
-</div>
-
-
-<!-- MENU -->
-
+<!-- MENÚ -->
 <nav id="main-menu">
-
-<a href="index.html" class="menu-item active" data-tooltip-pos="abajo" data-i18n-tooltip="tip_inicio">
-01
-</a>
-
-<a href="collage.html" class="menu-item" data-tooltip-pos="abajo" data-i18n-tooltip="tip_collage">
-02
-</a>
-
-<a href="mapa.html" class="menu-item" data-tooltip-pos="abajo" data-i18n-tooltip="tip_mapa">
-03
-</a>
-
-<a href="info.html" class="menu-item" data-tooltip-pos="abajo" data-i18n-tooltip="tip_info">
-04
-</a>
-
-<div id="lang-switch" role="group" aria-label="Idioma">
-<button class="lang-btn" data-lang="es" data-tooltip-pos="abajo" data-i18n-tooltip="tip_es" aria-label="Castellano">ES</button>
-<button class="lang-btn" data-lang="ca" data-tooltip-pos="abajo" data-i18n-tooltip="tip_ca" aria-label="Català">CA</button>
-</div>
-
+   <a href="index.html" class="menu-item active" data-tooltip-pos="abajo" data-i18n-tooltip="tip_inicio">01</a>
+   <a href="collage.html" class="menu-item" data-tooltip-pos="abajo" data-i18n-tooltip="tip_collage">02</a>
+   <a href="mapa.html" class="menu-item" data-tooltip-pos="abajo" data-i18n-tooltip="tip_mapa">03</a>
+   <a href="info.html" class="menu-item" data-tooltip-pos="abajo" data-i18n-tooltip="tip_info">04</a>
+   <div id="lang-switch" role="group" aria-label="Idioma">
+      <button class="lang-btn" data-lang="es" data-tooltip-pos="abajo" data-i18n-tooltip="tip_es" aria-label="Castellano">ES</button>
+      <button class="lang-btn" data-lang="ca" data-tooltip-pos="abajo" data-i18n-tooltip="tip_ca" aria-label="Català">CA</button>
+   </div>
 </nav>
 
 
-<!-- PAGE 1 -->
-
+<!-- PÁGINA 01 — INICIO -->
 <main id="pagina-inicio">
 
+   <div id="intro">
 
-<div id="intro">
+      <h1>Haciendo.lab</h1>
 
+      <p class="intro-subtitle" data-i18n="intro_subtitulo">
+         Herramientas creativas para la participación ciudadana inclusiva y la producción de conocimiento cualitativo sobre el espacio público.
+      </p>
 
-<h1>
-Haciendo.lab
-</h1>
+      <div id="intro-text">
+         <p data-i18n="intro_p1">Este espacio permite explorar, imaginar y compartir ideas sobre el espacio público de la ciudad.</p>
+         <p data-i18n="intro_p2">Puedes crear tu propio collage utilizando imágenes, dibujos y palabras.</p>
+      </div>
 
+      <!-- BOTONES 02 · 03 · 04 -->
+      <div id="intro-botones">
+         <a href="collage.html" class="boton-entrar">
+            <span>02</span>
+            <span data-i18n="entrar_collage">Entrar al collage →</span>
+         </a>
+         <a href="mapa.html" class="boton-entrar">
+            <span>03</span>
+            <span data-i18n="entrar_mapa">Entrar al mapa →</span>
+         </a>
+         <a href="info.html" class="boton-entrar claro">
+            <span>04</span>
+            <span data-i18n="entrar_info">Aprende más sobre el proyecto →</span>
+         </a>
+      </div>
 
-<p class="intro-subtitle" data-i18n="intro_subtitulo">
-Herramientas creativas para la participación ciudadana
-inclusiva y la producción de conocimiento cualitativo
-sobre el espacio público.
-</p>
+   </div>
 
-
-<div id="intro-text">
-
-<p data-i18n="intro_p1">
-Este espacio permite explorar, imaginar y compartir
-ideas sobre el espacio público de la ciudad.
-</p>
-
-<p data-i18n="intro_p2">
-Puedes crear tu propio collage utilizando imágenes,
-dibujos y palabras.
-</p>
-
-</div>
-
-
-<a
-href="collage.html"
-id="entrar">
-
-<span>02</span>
-
-<span data-i18n="entrar_collage">Entrar al collage →</span>
-
-</a>
-
-
-<a
-href="mapa.html"
-id="entrar-mapa">
-
-<span>03</span>
-
-<span data-i18n="entrar_mapa">Entrar al mapa →</span>
-
-</a>
-
-
-<a
-href="info.html"
-id="entrar-info">
-
-<span>04</span>
-
-<span data-i18n="entrar_info">Aprende más sobre el proyecto →</span>
-
-</a>
-
-
-</div>
-
-
-<!-- ELEMENTOS DECORATIVOS -->
-
-<div id="intro-element-1">
-✦
-</div>
-
-
-<div id="intro-element-2">
-+
-</div>
-
-
-<div id="intro-element-3">
-Abc
-</div>
-
-
-<div id="intro-element-4">
-●
-</div>
-
+   <!-- ELEMENTOS DECORATIVOS -->
+   <div id="intro-element-1" class="decorativo" aria-hidden="true">✦</div>
+   <div id="intro-element-2" class="decorativo" aria-hidden="true">+</div>
+   <div id="intro-element-3" class="decorativo" aria-hidden="true">Abc</div>
+   <div id="intro-element-4" class="decorativo" aria-hidden="true">●</div>
 
 </main>
 
 
 <script type="module" src="i18n.js"></script>
 
-
 </body>
-
 </html>

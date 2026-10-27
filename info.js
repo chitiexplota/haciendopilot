@@ -1,9 +1,21 @@
-/* IDIOMAS */
+/* =========================
+   PÁGINA 04 — CÓMO PARTICIPAR
+
+   Índice
+   1. Idiomas
+   2. Práctica: arrastrar el logo
+========================= */
+
+
+/* =========================
+   1. IDIOMAS
+========================= */
+
 import "./i18n.js";
 
 
 /* =========================
-   PRÁCTICA: ARRASTRAR EL LOGO
+   2. PRÁCTICA: ARRASTRAR EL LOGO
    Funciona con ratón, dedo y lápiz (pointer events).
 ========================= */
 
@@ -29,14 +41,13 @@ logo.addEventListener("pointerdown", (e) => {
 logo.addEventListener("pointermove", (e) => {
    if (!arrastrando) return;
 
-   const z = zona.getBoundingClientRect();
-
    // mantener el logo dentro de la zona de práctica
-   const maxX = z.width - logo.offsetWidth;
-   const maxY = z.height - logo.offsetHeight;
+   const z = zona.getBoundingClientRect();
+   const maxX = Math.max(z.width - logo.offsetWidth, 0);
+   const maxY = Math.max(z.height - logo.offsetHeight, 0);
 
-   const x = Math.min(Math.max(e.clientX - z.left - offsetX, 0), Math.max(maxX, 0));
-   const y = Math.min(Math.max(e.clientY - z.top - offsetY, 0), Math.max(maxY, 0));
+   const x = Math.min(Math.max(e.clientX - z.left - offsetX, 0), maxX);
+   const y = Math.min(Math.max(e.clientY - z.top - offsetY, 0), maxY);
 
    logo.style.left = x + "px";
    logo.style.top = y + "px";
@@ -46,9 +57,7 @@ function soltar(e) {
    if (!arrastrando) return;
    arrastrando = false;
    logo.classList.remove("agarrado");
-   if (logo.hasPointerCapture(e.pointerId)) {
-      logo.releasePointerCapture(e.pointerId);
-   }
+   if (logo.hasPointerCapture(e.pointerId)) logo.releasePointerCapture(e.pointerId);
 }
 
 logo.addEventListener("pointerup", soltar);

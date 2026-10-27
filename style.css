@@ -1,673 +1,115 @@
-:root {
- --blanco: #E6E6E6;
- --azul: #1362E3;
- --magenta: #DA64F0;
- --limon: #F8D309;
- --rojo: #E22D2C;
- --dark: #2B2B2B;
+/* =========================
+   HACIENDO.LAB — ESTILOS COMUNES
+   Todas las páginas cargan este archivo.
+   Cada página añade el suyo: collage.css, mapa.css, info.css.
 
- /* altura de la galería fija de abajo: los botones del collage se colocan por encima */
- --altura-galeria: 180px;
+   Índice
+   1. Variables
+   2. Base
+   3. Cabecera: logo, subtítulo, menú e idioma
+   4. Botones de entrada
+   5. Descripciones al pasar el ratón
+   6. Página 01 — Inicio
+   7. Móvil
+========================= */
+
+
+/* =========================
+   1. VARIABLES
+========================= */
+
+:root {
+   --blanco: #E6E6E6;
+   --azul: #1362E3;
+   --magenta: #DA64F0;
+   --limon: #F8D309;
+   --rojo: #E22D2C;
+   --dark: #2B2B2B;
+
+   --fuente: 'Inter', Arial, Helvetica, sans-serif;
 }
 
+
+/* =========================
+   2. BASE
+========================= */
 
 body {
    margin: 0;
    overflow-y: scroll;
-   font-family: Arial, Helvetica, sans-serif, sans-serif;
-   color: #E6E6E6;
-   background-color: var(--blanco);  
+   font-family: var(--fuente);
+   color: var(--dark);
+   background-color: var(--blanco);
 }
 
+
+/* =========================
+   3. CABECERA
+========================= */
+
+/* Logo */
+#logo-link {
+   position: absolute;   /* fuera del flujo: no empuja el contenido hacia abajo */
+   top: 0;
+   left: 0;
+   cursor: pointer;
+}
 
 .logo {
- position: fixed;
- top: 20px;     
- left: 10px;   
- width: 300px;  
- height: auto;
- z-index: 9999;
- transition: opacity 0.3s ease, transform 0.3s ease;
+   position: fixed;
+   top: 20px;
+   left: 10px;
+   z-index: 9999;
+   width: 300px;
+   height: auto;
+   transition: opacity 0.3s ease, transform 0.3s ease;
 }
-
-
-#logo-link {
- display: inline-block;
- cursor: pointer;
-}
-
 
 #logo-link:hover .logo {
- transform: rotate(-6deg);
+   transform: rotate(-6deg);
 }
 
-
+/* Subtítulo */
 #logo-subtitle {
- position: fixed;
- top: 20px;
- left: 20px;
- z-index: 9999;
- font-family: 'Inter', sans-serif;
- font-weight: 440;
- font-size: 16px;
- line-height: 18px;
- color: var(--dark);
- transition: opacity 0.3s ease;
-}
-
-
-/* IMAGE CONTAINER */
-#elementos-canvas {
-   position:absolute;
-   top:0;
-   left:0;
-   width:100%;
-   z-index:20;
-   pointer-events:none; z-index: 20;
-}
-
-#fondos-fijos {
-   position: absolute;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 200vh;
-   z-index: 1;          
-   pointer-events: none;
-}
-
-.imagen-fija {
-   position: absolute;
-   width: 400px;       
-   height: auto;
-   pointer-events: none;
-   user-select: none;
-}
-
-
-/* IMAGEN Y LETRA INDEPENDIENTE */
-
-
-.imagen-movil {
-   position:absolute;
-   width:220px;
-   height:auto;
-   cursor:grab;
-   user-select:none;
-   touch-action:none;
-   pointer-events:auto;
-}
-
-
-
-
-.imagen-movil:active {
-   cursor:grabbing;
-}
-
-
-.letra-movil {
-   position:absolute;
-   width:40px;
-   height:auto;
-   cursor:grab;
-   user-select:none;
-   touch-action:none;
-   pointer-events:auto;
-}
-
-
-.letra-movil:active {
-   cursor:grabbing;
-}
-
-
-/* CANVAS */
-#zona-dibujo {
-   width: 100%;
-   height: 200vh;
-   position: relative;
-
-}
-
-canvas {
-   display: block;
-   background: #E6E6E6;
-   cursor: crosshair;
-   position: absolute;
-   top: 0;
-   left: 0;
-   z-index: 10;         
-}
-
-
-
-#canvas {
-   height: 200vh;
-   z-index: 5;
-   background: transparent;
-}
-
-
-#text-canvas {
-   width: 100%;
-   height: 200vh;
-   position: absolute;
-   top: 0;
-   left: 0;
-   z-index: 30;
-   pointer-events: none;
-   background: transparent;
-}
-
-
-/* BOTÓN TOOLS*/
-/* BOTÓN CRAYON */
-
-
-#crayon-btn {
-   position: fixed;
-   right: 20px;
-   bottom: calc(var(--altura-galeria) + 112px);
-
-
-   width: 72px;
-   height: 72px;
-
-
-   border-radius: 50%;
-   border: none;
-
-
-   background: var(--limon);
-
-
-   cursor: pointer;
-
-
-   z-index: 5000;
-
-
-   display: flex;
-   align-items: center;
-   justify-content: center;
-
-
-   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-
-
-   transition: transform 0.2s ease;
-}
-
-
-#crayon-btn:hover {
-   transform: scale(1.08);
-}
-
-
-#crayon-btn img {
-   width: 40px;
-   height: auto;
-   display: block;
-   rotate: -45deg;
-   pointer-events: none;
-}
-
-
-
-/* CRAYON */
-#crayon-btn img {
-   width: 40px;
-   height: auto;
-   display: block;
-   pointer-events: none;
-}
-
-
-/* TOOL MENU */
-#tools-menu {
-   position: fixed;
-   right: 25px;
-   bottom: calc(var(--altura-galeria) + 200px);
-   display: none;
-   flex-direction: column;
-   gap: 15px;
-   z-index: 5001;
-}
-
-
-.tool-circle {
-   width: 60px;
-   height: 60px;
-   border-radius: 50%;
-   border: none;
-   cursor: pointer;
-
-
-   display: flex;
-   align-items: center;
-   justify-content: center;
-
-
-   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-
-
-
-/* COLOR BUTTON */
-#color-tool {
-   background: var(--dark);
-}
-
-
-/* hidden native picker */
-#color-picker {
-   position: absolute;
-   opacity: 0;
-   pointer-events: none;
-}
-
-
-
-
-#color-tool:hover {
-   transform: translateY(-5%) scale(1.08);
-}
-
-
-/* TEXT */
-#text-tool {
-   background: var(--magenta);
-   font-size: 24px;
-   color: var(--blanco);
-}
-
-
-#text-tool:hover {
-   transform: translateY(-5%) scale(1.08);
-}
-
-
-/* ERASER */
-#eraser-tool {
-   background: var(--azul);
-}
-
-
-#eraser-tool img {
-   width: 35px;
-   height: auto;
-   pointer-events: none;
-}
-
-
-#eraser-tool:hover {
-   transform: translateY(-5%) scale(1.08);
-}
-
-
-#mano-tool {
-   background: var(--magenta);
-   color: var(--blanco);
-   font-size: 12px;
-}
-
-
-/* HAND */
-#mano-tool:hover {
-   transform: translateY(-5%) scale(1.08);
-}
-
-
-#mano-tool.activo {
-   outline: 3px solid var(--dark);
-}
-
-
-#crayon-btn.activo {
-   outline: 3px solid var(--dark);
-}
-
-
-/* BOTÓN ENVIAR */
-#enviar {
    position: fixed;
    top: 20px;
-   right: 20px;
-   padding: 12px 20px;
-    font-family: 'Inter', sans-serif;
-   font-size: 16px;
-   z-index: 200;
-   background-color: #E6E6E6;
-   color: var(--azul);
-   border: none;
-   border-radius: 12px;
-   cursor: pointer;
-   transition: all 0.3s ease;
-}
-
-
-#enviar:hover {
-    background-color: var(--azul);
-    color: var(--blanco);
-}
-
-
-/* GALERÍA */
-#galeria-wrapper {
-   position: fixed;
-   bottom: 0;
-   left: 0;
-   width: 100%;
-   background: #E6E6E6;
-   backdrop-filter: blur(10px);
-   border-top: 1px solid rgba(0,0,0,0.1);
-   z-index: 9999;
-}
-
-
-#galeria-title {
-   font-size: 14px;
-   font-weight: bold;
-   padding: 10px;
-   color: var(--dark);
-   border-bottom: 1px solid rgba(0,0,0,0.08);
-}
-
-
-#galeria {
-   height: 120px;
-   overflow-x: auto;
-   display: flex;
-   align-items: center;
-   gap: 8px;
-   padding: 10px;
-}
-
-
-#galeria img {
-   height: 100px;
-   border-radius: 8px;
-   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-   cursor: pointer;
-   transition: transform 0.2s ease;
-}
-
-
-#galeria img:hover {
-   transform: scale(1.05);
-}
-
-
-/* POPUP */
-#popup {
-   position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
-   background: rgba(0,0,0,0.8);
-   display: none;
-   justify-content: center;
-   align-items: center;
-   z-index: 99999;
-}
-
-
-#popup img {
-   max-width: 90%;
-   max-height: 90%;
-   border-radius: 10px;
-   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-   background: var(--blanco);
-}
-
-
-/* BOTÓN SUGERIR */
-#sugerir-btn {
-   position: fixed;
    left: 20px;
-   bottom: calc(var(--altura-galeria) + 20px);
-
-
-   width: 60px;
-   height: 60px;
-
-
-   border-radius: 50%;
-   border: none;
-
-
-   background: var(--azul);
-   color: var(--blanco);
-
-
-   font-size: 30px;
-   font-weight: bold;
-   line-height: 1;
-
-
-   display: flex;
-   align-items: center;
-   justify-content: center;
-
-
-   cursor: pointer;
-
-
-   z-index: 5000;
-
-
-   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-
-
-   transition: transform 0.2s ease;
-}
-
-
-#sugerir-btn span {
-   display: block;
-   margin-top: -2px;
-   pointer-events: none;
-}
-
-
-#sugerir-btn:hover {
-   transform: scale(1.08);
-}
-
-
-/* POPUP SUGERENCIAS */
-#sugerir-popup {
-   position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
-   background: rgba(0,0,0,0.7);
-   display: none;
-   justify-content: center;
-   align-items: center;
-   z-index: 99999;
-}
-
-
-#sugerir-popup-content {
-   position: relative;
-   background: var(--blanco);
-   color: var(--dark);
-   border-radius: 14px;
-   padding: 30px;
-   width: 90%;
-   max-width: 420px;
-   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-}
-
-
-#sugerir-close {
-   position: absolute;
-   top: 10px;
-   right: 14px;
-   background: none;
-   border: none;
-   font-size: 26px;
-   line-height: 1;
-   cursor: pointer;
-   color: var(--dark);
-}
-
-
-#sugerir-popup-content h3 {
+   z-index: 9999;
    font-size: 16px;
-   margin: 0 0 16px 0;
-   padding-right: 24px;
+   font-weight: 440;
+   line-height: 18px;
    color: var(--dark);
+   transition: opacity 0.3s ease;
 }
 
-
-#sugerencias-form {
-   display: flex;
-   gap: 8px;
-   margin-bottom: 16px;
-}
-
-
-#sugerencia-input {
-   flex: 1;
-   padding: 8px 12px;
-   border-radius: 8px;
-   border: 1px solid rgba(0,0,0,0.15);
-   font-family: Arial, Helvetica, sans-serif;
-   font-size: 14px;
-   color: var(--dark);
-}
-
-
-#sugerencia-btn {
-   padding: 8px 16px;
-   border-radius: 8px;
-   border: none;
-   background-color: var(--azul);
-   color: var(--blanco);
-   font-size: 14px;
-   cursor: pointer;
-   transition: all 0.3s ease;
-}
-
-
-#sugerencia-btn:hover {
-   background-color: var(--magenta);
-}
-
-
-#sugerencias-lista {
-   display: flex;
-   flex-wrap: wrap;
-   gap: 8px;
-   max-height: 200px;
-   overflow-y: auto;
-}
-
-
-.sugerencia-pill {
-   background: var(--dark);
-   color: var(--blanco);
-   padding: 6px 14px;
-   border-radius: 20px;
-   font-size: 13px;
-   white-space: nowrap;
-}
-
-#mover-btn {
-   position: fixed;
-   right: 20px;
-   bottom: calc(var(--altura-galeria) + 20px);
-   width: 72px;
-   height: 72px;
-   border-radius: 50%;
-   border: none;
-   background: var(--magenta);
-   cursor: pointer;
-   z-index: 5000;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-   transition: transform 0.2s ease;
-}
-
-#mover-btn:hover {
-   transform: scale(1.08);
-}
-
-#mover-btn img {
-   max-width: 38px;
-   max-height: 38px;
-   width: auto;
-   height: auto;
-   object-fit: contain;
-   display: block;
-   margin: auto;
-   pointer-events: none;
-}
-
-#mover-btn.activo {
-   outline: 3px solid var(--dark);
-}
-
-body.modo-dibujo .imagen-movil,
-body.modo-dibujo .letra-movil {
-   pointer-events: none;
-}
-
-body.modo-dibujo #canvas {
-   z-index: 25;
-}
-
-/* =========================
-   PAGE NAVIGATION
-========================= */
-
+/* Menú 01 · 02 · 03 · 04 */
 #main-menu {
    position: fixed;
    top: 20px;
    right: 20px;
-
-   display: flex;
-   gap: 8px;
-
    z-index: 10000;
+   display: flex;
+   align-items: center;
+   gap: 8px;
 }
 
 .menu-item {
+   position: relative;
    display: flex;
    align-items: center;
    justify-content: center;
-
    min-width: 42px;
    height: 42px;
-
    padding: 0 12px;
-
    box-sizing: border-box;
-
    border: 2px solid var(--dark);
    border-radius: 50px;
-
    background: var(--blanco);
    color: var(--dark);
-
-   font-family: 'Inter', Arial, Helvetica, sans-serif;
    font-size: 14px;
    font-weight: 500;
-
    text-decoration: none;
-
-   transition:
-      background-color 0.2s ease,
-      color 0.2s ease,
-      transform 0.2s ease;
+   transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .menu-item:hover {
@@ -681,496 +123,7 @@ body.modo-dibujo #canvas {
    color: var(--blanco);
 }
 
-
-/* =========================
-   PAGE 1
-========================= */
-
-#page-content {
-   width: 100%;
-   min-height: 100vh;
-
-   box-sizing: border-box;
-
-   padding: 180px 20px 100px 20px;
-
-   font-family: 'Inter', Arial, Helvetica, sans-serif;
-
-   color: var(--dark);
-   background: var(--blanco);
-}
-
-#page-content h1 {
-   margin: 0 0 20px 0;
-
-   font-size: clamp(48px, 8vw, 100px);
-   line-height: 0.95;
-   font-weight: 600;
-}
-
-#page-content p {
-   max-width: 650px;
-
-   margin: 0;
-
-   font-size: 20px;
-   line-height: 1.4;
-}
-
-#start-button {
-   display: inline-flex;
-   align-items: center;
-
-   width: fit-content;
-
-   margin-top: 35px;
-   padding: 12px 20px;
-
-   border-radius: 12px;
-
-   background: var(--azul);
-   color: var(--blanco);
-
-   font-family: 'Inter', Arial, Helvetica, sans-serif;
-   font-size: 16px;
-
-   text-decoration: none;
-
-   transition:
-      background-color 0.2s ease,
-      transform 0.2s ease;
-}
-
-#start-button:hover {
-   background: var(--magenta);
-   transform: translateY(-2px);
-}
-
-/* =========================
-   PAGE 1 — INTRO
-========================= */
-
-#pagina-inicio {
-
-   position: relative;
-
-   width: 100%;
-   min-height: 200vh;
-
-   box-sizing: border-box;
-
-   background: var(--blanco);
-
-   overflow: hidden;
-
-   font-family: 'Inter', sans-serif;
-
-   color: var(--dark);
-}
-
-
-/* =========================
-   INTRO TEXT
-========================= */
-
-#intro {
-
-   position: absolute;
-
-   top: 25vh;
-   left: 10vw;
-
-   width: min(620px, 70vw);
-
-   z-index: 50;
-}
-
-
-#intro h1 {
-
-   margin: 0 0 25px 0;
-
-   font-size: clamp(55px, 9vw, 120px);
-
-   line-height: 0.9;
-
-   font-weight: 500;
-
-   letter-spacing: -0.06em;
-
-   color: var(--dark);
-
-}
-
-
-.intro-subtitle {
-
-   max-width: 600px;
-
-   margin: 0 0 35px 0;
-
-   font-size: 24px;
-
-   line-height: 1.25;
-
-   font-weight: 450;
-
-}
-
-
-#intro-text {
-
-   max-width: 480px;
-
-   font-size: 16px;
-
-   line-height: 1.4;
-
-}
-
-
-#intro-text p {
-
-   margin: 0 0 15px 0;
-
-}
-
-
-/* =========================
-   ENTER BUTTON
-========================= */
-
-#entrar,
-#entrar-mapa {
-
-   display: flex;
-
-   align-items: center;
-
-   gap: 15px;
-
-   width: fit-content;
-
-   margin-top: 40px;
-
-   padding: 10px 18px;
-
-   border-radius: 50px;
-
-   background: var(--azul);
-
-   color: var(--blanco);
-
-   text-decoration: none;
-
-   font-size: 16px;
-
-   transition:
-      transform 0.2s ease,
-      background-color 0.2s ease;
-
-}
-
-
-#entrar span:first-child,
-#entrar-mapa span:first-child {
-
-   display: flex;
-
-   align-items: center;
-
-   justify-content: center;
-
-   width: 28px;
-
-   height: 28px;
-
-   border-radius: 50%;
-
-   background: var(--limon);
-
-   color: var(--dark);
-
-   font-size: 12px;
-
-}
-
-
-#entrar:hover,
-#entrar-mapa:hover {
-
-   transform: scale(1.05);
-
-   background: var(--magenta);
-
-}
-
-
-/* =========================
-   DECORATIVE ELEMENTS
-========================= */
-
-#intro-element-1 {
-
-   position: absolute;
-
-   top: 25vh;
-
-   right: 18vw;
-
-   width: 140px;
-
-   height: 140px;
-
-   display: flex;
-
-   align-items: center;
-
-   justify-content: center;
-
-   border-radius: 50%;
-
-   background: var(--limon);
-
-   color: var(--dark);
-
-   font-size: 70px;
-
-   transform: rotate(12deg);
-
-}
-
-
-#intro-element-2 {
-
-   position: absolute;
-
-   top: 55vh;
-
-   right: 10vw;
-
-   width: 90px;
-
-   height: 90px;
-
-   display: flex;
-
-   align-items: center;
-
-   justify-content: center;
-
-   border-radius: 50%;
-
-   background: var(--magenta);
-
-   color: var(--blanco);
-
-   font-size: 50px;
-
-   font-weight: 300;
-
-   transform: rotate(-10deg);
-
-}
-
-
-#intro-element-3 {
-
-   position: absolute;
-
-   top: 110vh;
-
-   left: 15vw;
-
-   width: 110px;
-
-   height: 110px;
-
-   display: flex;
-
-   align-items: center;
-
-   justify-content: center;
-
-   border-radius: 50%;
-
-   background: var(--rojo);
-
-   color: var(--blanco);
-
-   font-size: 24px;
-
-   transform: rotate(8deg);
-
-}
-
-
-#intro-element-4 {
-
-   position: absolute;
-
-   top: 85vh;
-
-   right: 25vw;
-
-   width: 55px;
-
-   height: 55px;
-
-   display: flex;
-
-   align-items: center;
-
-   justify-content: center;
-
-   border-radius: 50%;
-
-   background: var(--azul);
-
-   color: var(--blanco);
-
-   font-size: 25px;
-
-}
-
-
-/* =========================
-   MENU
-========================= */
-
-#main-menu {
-
-   position: fixed;
-
-   top: 20px;
-
-   right: 20px;
-
-   display: flex;
-
-   gap: 8px;
-
-   z-index: 10000;
-
-}
-
-
-.menu-item {
-
-   display: flex;
-
-   align-items: center;
-
-   justify-content: center;
-
-   min-width: 42px;
-
-   height: 42px;
-
-   padding: 0 12px;
-
-   box-sizing: border-box;
-
-   border: 2px solid var(--dark);
-
-   border-radius: 50px;
-
-   background: var(--blanco);
-
-   color: var(--dark);
-
-   font-family: 'Inter', sans-serif;
-
-   font-size: 14px;
-
-   text-decoration: none;
-
-   transition:
-      background-color 0.2s ease,
-      color 0.2s ease,
-      transform 0.2s ease;
-
-}
-
-
-.menu-item:hover {
-
-   background: var(--limon);
-
-   transform: scale(1.08);
-
-}
-
-
-.menu-item.active {
-
-   background: var(--dark);
-
-   color: var(--blanco);
-
-}
-
-
-/* =========================
-   BOTÓN ENTRAR AL MAPA (página 01)
-========================= */
-
-#entrar-mapa {
-   margin-top: 12px;
-}
-
-
-/* =========================
-   BOTÓN APRENDE MÁS (página 01)
-   Versión clara: resalta menos que 02 y 03
-========================= */
-
-#entrar-info {
-   display: flex;
-   align-items: center;
-   gap: 15px;
-   width: fit-content;
-   margin-top: 12px;
-   padding: 8px 16px;
-   box-sizing: border-box;
-
-   border: 2px solid var(--dark);
-   border-radius: 50px;
-
-   background: var(--blanco);
-   color: var(--dark);
-
-   text-decoration: none;
-   font-size: 16px;
-
-   transition:
-      transform 0.2s ease,
-      background-color 0.2s ease;
-}
-
-#entrar-info span:first-child {
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   width: 28px;
-   height: 28px;
-   border-radius: 50%;
-   background: var(--limon);
-   color: var(--dark);
-   font-size: 12px;
-}
-
-#entrar-info:hover {
-   transform: scale(1.05);
-   background: var(--limon);
-}
-
-
-/* =========================
-   SELECTOR DE IDIOMA ES / CA
-   (dentro de #main-menu en todas las páginas)
-========================= */
-
+/* Selector de idioma ES / CA */
 #lang-switch {
    display: flex;
    align-items: center;
@@ -1184,6 +137,7 @@ body.modo-dibujo #canvas {
 }
 
 .lang-btn {
+   position: relative;
    height: 32px;
    min-width: 34px;
    padding: 0 8px;
@@ -1191,7 +145,7 @@ body.modo-dibujo #canvas {
    border-radius: 50px;
    background: transparent;
    color: var(--dark);
-   font-family: 'Inter', Arial, Helvetica, sans-serif;
+   font-family: var(--fuente);
    font-size: 13px;
    font-weight: 500;
    cursor: pointer;
@@ -1209,82 +163,87 @@ body.modo-dibujo #canvas {
 
 
 /* =========================
-   PÁGINA 02 — COLLAGE CON MENÚ
-   (#enviar baja para dejar sitio al menú 01 · 02 · 03 · 04)
+   4. BOTONES DE ENTRADA
+   (portada y página 04)
+   .boton-entrar         → azul (principal)
+   .boton-entrar.claro   → claro (secundario)
 ========================= */
 
-body.pagina-collage #enviar {
-   top: 75px;
+.boton-entrar {
+   display: flex;
+   align-items: center;
+   gap: 15px;
+   width: fit-content;
+   padding: 10px 18px;
+   box-sizing: border-box;
+   border: 2px solid var(--azul);
+   border-radius: 50px;
+   background: var(--azul);
+   color: var(--blanco);
+   font-size: 16px;
+   text-decoration: none;
+   transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.boton-entrar span:first-child {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   flex-shrink: 0;
+   width: 28px;
+   height: 28px;
+   border-radius: 50%;
+   background: var(--limon);
+   color: var(--dark);
+   font-size: 12px;
+}
+
+.boton-entrar:hover {
+   transform: scale(1.05);
+   border-color: var(--magenta);
+   background: var(--magenta);
+}
+
+.boton-entrar.claro {
+   border-color: var(--dark);
+   background: var(--blanco);
+   color: var(--dark);
+}
+
+.boton-entrar.claro:hover {
+   border-color: var(--dark);
+   background: var(--limon);
 }
 
 
 /* =========================
-   MENÚ EN MÓVIL
-========================= */
-
-@media (max-width: 600px) {
-
-   #main-menu {
-      right: 10px;
-      gap: 4px;
-   }
-
-   .menu-item {
-      min-width: 36px;
-      height: 36px;
-      padding: 0 8px;
-      font-size: 12px;
-   }
-
-   #lang-switch {
-      height: 36px;
-   }
-
-   .lang-btn {
-      height: 26px;
-      min-width: 28px;
-      font-size: 12px;
-   }
-}
-
-
-/* =========================
-   DESCRIPCIONES AL PASAR EL RATÓN (tooltips)
+   5. DESCRIPCIONES AL PASAR EL RATÓN
    - El texto sale de data-tooltip, que i18n.js rellena en ES o CA.
    - Por defecto aparece a la izquierda del botón.
    - data-tooltip-pos="abajo"   → debajo (menú, idioma, Enviar)
    - data-tooltip-pos="derecha" → a la derecha (botón + del collage)
+   - Solo en dispositivos con ratón: en móvil no se quedan pegadas.
 ========================= */
-
-.menu-item,
-.lang-btn,
-.tool-circle {
-   position: relative;
-}
 
 [data-tooltip]::after {
    content: attr(data-tooltip);
    position: absolute;
    top: 50%;
    right: calc(100% + 12px);
+   z-index: 10002;
    transform: translateY(-50%);
-
    padding: 6px 10px;
    border-radius: 8px;
-
    background: var(--dark);
    color: var(--blanco);
-
-   font-family: 'Inter', Arial, Helvetica, sans-serif;
+   font-family: var(--fuente);
    font-size: 13px;
    font-weight: 400;
    line-height: 1.2;
    white-space: nowrap;
-
    opacity: 0;
    pointer-events: none;
    transition: opacity 0.15s ease;
-   z-index: 10002;
 }
 
 [data-tooltip-pos="abajo"]::after {
@@ -1298,28 +257,215 @@ body.pagina-collage #enviar {
    left: calc(100% + 12px);
 }
 
-/* PANTALLAS BAJAS: el menú de herramientas se abre en horizontal,
-   a la izquierda del lápiz, para no chocar con "Enviar Collage" */
-@media (max-height: 720px) {
-   #tools-menu {
-      flex-direction: row;
-      right: 110px;
-      bottom: calc(var(--altura-galeria) + 118px);
-   }
-
-   /* en horizontal, la descripción sale encima del botón */
-   #tools-menu [data-tooltip]::after {
-      top: auto;
-      bottom: calc(100% + 10px);
-      right: 50%;
-      transform: translateX(50%);
-   }
-}
-
-/* solo en dispositivos con ratón (en móvil no se quedan pegadas) */
 @media (hover: hover) {
    [data-tooltip]:hover::after,
    [data-tooltip]:focus-visible::after {
       opacity: 1;
+   }
+}
+
+
+/* =========================
+   6. PÁGINA 01 — INICIO
+========================= */
+
+#pagina-inicio {
+   position: relative;
+   width: 100%;
+   min-height: 200vh;
+   box-sizing: border-box;
+   overflow: hidden;
+}
+
+/* Texto */
+#intro {
+   position: absolute;
+   top: 25vh;
+   left: 10vw;
+   z-index: 50;
+   width: min(620px, 70vw);
+}
+
+#intro h1 {
+   margin: 0 0 25px 0;
+   font-size: clamp(55px, 9vw, 120px);
+   font-weight: 500;
+   line-height: 0.9;
+   letter-spacing: -0.06em;
+}
+
+.intro-subtitle {
+   max-width: 600px;
+   margin: 0 0 35px 0;
+   font-size: 24px;
+   font-weight: 450;
+   line-height: 1.25;
+}
+
+#intro-text {
+   max-width: 480px;
+   font-size: 16px;
+   line-height: 1.4;
+}
+
+#intro-text p {
+   margin: 0 0 15px 0;
+}
+
+/* Botones 02 · 03 · 04 */
+#intro-botones {
+   display: flex;
+   flex-direction: column;
+   gap: 12px;
+   margin-top: 40px;
+}
+
+/* Elementos decorativos */
+.decorativo {
+   position: absolute;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   border-radius: 50%;
+}
+
+#intro-element-1 {
+   top: 25vh;
+   right: 18vw;
+   width: 140px;
+   height: 140px;
+   transform: rotate(12deg);
+   background: var(--limon);
+   color: var(--dark);
+   font-size: 70px;
+}
+
+#intro-element-2 {
+   top: 55vh;
+   right: 10vw;
+   width: 90px;
+   height: 90px;
+   transform: rotate(-10deg);
+   background: var(--magenta);
+   color: var(--blanco);
+   font-size: 50px;
+   font-weight: 300;
+}
+
+#intro-element-3 {
+   top: 110vh;
+   left: 15vw;
+   width: 110px;
+   height: 110px;
+   transform: rotate(8deg);
+   background: var(--rojo);
+   color: var(--blanco);
+   font-size: 24px;
+}
+
+#intro-element-4 {
+   top: 85vh;
+   right: 25vw;
+   width: 55px;
+   height: 55px;
+   background: var(--azul);
+   color: var(--blanco);
+   font-size: 25px;
+}
+
+
+/* =========================
+   7. MÓVIL (hasta 700 px de ancho)
+========================= */
+
+@media (max-width: 700px) {
+
+   /* Cabecera: menú arriba, subtítulo y logo debajo */
+   #main-menu {
+      top: 12px;
+      right: 12px;
+      gap: 4px;
+   }
+
+   .menu-item {
+      min-width: 36px;
+      height: 36px;
+      padding: 0 8px;
+      font-size: 12px;
+   }
+
+   #lang-switch {
+      height: 36px;
+      margin-left: 4px;
+   }
+
+   .lang-btn {
+      height: 26px;
+      min-width: 28px;
+      font-size: 12px;
+   }
+
+   #logo-subtitle {
+      top: 60px;
+      left: 14px;
+      font-size: 12px;
+      line-height: 14px;
+   }
+
+   .logo {
+      top: 62px;
+      left: 4px;
+      width: 170px;
+   }
+
+   /* Inicio: el texto ocupa todo el ancho y los círculos van debajo */
+   #pagina-inicio {
+      min-height: 100vh;
+      padding: 170px 20px 230px 20px;
+   }
+
+   #intro {
+      position: static;
+      width: auto;
+   }
+
+   .intro-subtitle {
+      font-size: 20px;
+   }
+
+   #intro-element-1 {
+      top: auto;
+      bottom: 90px;
+      right: 30px;
+      width: 90px;
+      height: 90px;
+      font-size: 44px;
+   }
+
+   #intro-element-2 {
+      top: auto;
+      bottom: 40px;
+      right: 140px;
+      width: 60px;
+      height: 60px;
+      font-size: 34px;
+   }
+
+   #intro-element-3 {
+      top: auto;
+      bottom: 110px;
+      left: 30px;
+      width: 70px;
+      height: 70px;
+      font-size: 16px;
+   }
+
+   #intro-element-4 {
+      top: auto;
+      bottom: 40px;
+      left: 110px;
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
    }
 }

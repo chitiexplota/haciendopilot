@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
-<title data-i18n="title_mapa">Haciendo.lab — Mapa</title>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta name="robots" content="noindex, nofollow">
+   <title data-i18n="title_mapa">Haciendo.lab — Mapa</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="mapa.css">
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+   <link rel="stylesheet" href="style.css">
+   <link rel="stylesheet" href="mapa.css">
 </head>
 
 <body class="pagina-mapa">
@@ -19,27 +18,26 @@
 
 <!-- LOGO -->
 <a href="https://chitiexplota.github.io/haciendopilot/" id="logo-link">
- <img src="logo.png" class="logo" alt="Logo">
+   <img src="logo.png" class="logo" alt="Haciendo.lab">
 </a>
 <div id="logo-subtitle">Digital Urban Living Lab<br>MSc RePIC's Master Thesis</div>
 
 
-<!-- MENU -->
+<!-- MENÚ -->
 <nav id="main-menu">
-<a href="index.html" class="menu-item" data-tooltip-pos="abajo" data-i18n-tooltip="tip_inicio">01</a>
-<a href="collage.html" class="menu-item" data-tooltip-pos="abajo" data-i18n-tooltip="tip_collage">02</a>
-<a href="mapa.html" class="menu-item active" data-tooltip-pos="abajo" data-i18n-tooltip="tip_mapa">03</a>
-<a href="info.html" class="menu-item" data-tooltip-pos="abajo" data-i18n-tooltip="tip_info">04</a>
-<div id="lang-switch" role="group" aria-label="Idioma">
-<button class="lang-btn" data-lang="es" data-tooltip-pos="abajo" data-i18n-tooltip="tip_es" aria-label="Castellano">ES</button>
-<button class="lang-btn" data-lang="ca" data-tooltip-pos="abajo" data-i18n-tooltip="tip_ca" aria-label="Català">CA</button>
-</div>
+   <a href="index.html" class="menu-item" data-tooltip-pos="abajo" data-i18n-tooltip="tip_inicio">01</a>
+   <a href="collage.html" class="menu-item" data-tooltip-pos="abajo" data-i18n-tooltip="tip_collage">02</a>
+   <a href="mapa.html" class="menu-item active" data-tooltip-pos="abajo" data-i18n-tooltip="tip_mapa">03</a>
+   <a href="info.html" class="menu-item" data-tooltip-pos="abajo" data-i18n-tooltip="tip_info">04</a>
+   <div id="lang-switch" role="group" aria-label="Idioma">
+      <button class="lang-btn" data-lang="es" data-tooltip-pos="abajo" data-i18n-tooltip="tip_es" aria-label="Castellano">ES</button>
+      <button class="lang-btn" data-lang="ca" data-tooltip-pos="abajo" data-i18n-tooltip="tip_ca" aria-label="Català">CA</button>
+   </div>
 </nav>
 
 
 <!-- BUSCADOR -->
-<input id="searchBox" type="text" placeholder="buscar dirección" aria-label="Buscar dirección"
- data-i18n-placeholder="buscar_placeholder" data-i18n-aria="buscar_aria" />
+<input id="searchBox" type="text" placeholder="buscar dirección" aria-label="Buscar dirección" data-i18n-placeholder="buscar_placeholder" data-i18n-aria="buscar_aria">
 <div id="suggestions" role="listbox" aria-label="Sugerencias de direcciones" data-i18n-aria="sugerencias_aria"></div>
 
 
@@ -51,15 +49,15 @@
 <div id="map" role="application" aria-label="Mapa interactivo de Barcelona" data-i18n-aria="mapa_aria" tabindex="0"></div>
 
 
-<!-- BOTONES -->
+<!-- BOTONES DEL MAPA -->
 <button class="zoomBtn" id="zoomIn" aria-label="Acercar mapa" data-i18n-aria="zoom_in_aria" data-i18n-tooltip="zoom_in_aria">+</button>
 <button class="zoomBtn" id="zoomOut" aria-label="Alejar mapa" data-i18n-aria="zoom_out_aria" data-i18n-tooltip="zoom_out_aria">−</button>
 <button class="zoomBtn" id="contrastToggle" aria-label="Alternar alto contraste" data-i18n-aria="contraste_aria" data-i18n-tooltip="contraste_aria">◐</button>
 <button class="zoomBtn" id="listToggle" aria-label="Ver lista de lugares" data-i18n-aria="lista_aria" data-i18n-tooltip="lista_aria">☰</button>
 
 
-<!-- LISTA DE LUGARES -->
-<div id="pinList" style="display:none;"></div>
+<!-- LISTA DE LUGARES (la rellena mapa.js) -->
+<div id="pinList"></div>
 
 
 <script type="module" src="mapa.js"></script>

@@ -1,0 +1,519 @@
+/* =========================
+   PÁGINA 02 — COLLAGE
+   (los colores, la cabecera y el menú vienen de style.css)
+
+   Índice
+   1. Medidas
+   2. Zona de dibujo y elementos
+   3. Botones: Enviar, mover, dibujar y herramientas
+   4. Galería
+   5. Popups: collage ampliado y sugerencias
+   6. Pantallas bajas
+   7. Móvil
+========================= */
+
+
+/* =========================
+   1. MEDIDAS
+   Todos los botones se colocan a partir de estas variables:
+   para cambiar un tamaño, basta con tocarlo aquí.
+========================= */
+
+body.pagina-collage {
+   --altura-galeria: 180px;     /* galería fija de abajo */
+   --margen: 20px;              /* separación con los bordes */
+   --boton-grande: 72px;        /* mover y dibujar */
+   --boton-herramienta: 60px;   /* color, texto, goma y + */
+   --separacion: 12px;          /* entre botones */
+
+   overflow-x: hidden;
+}
+
+
+/* =========================
+   2. ZONA DE DIBUJO Y ELEMENTOS
+   Orden de capas (de abajo arriba):
+   imágenes y letras (20) → dibujo (25) → textos (30)
+========================= */
+
+#zona-dibujo {
+   position: relative;
+   width: 100%;
+   height: 200vh;
+}
+
+#canvas,
+#text-canvas {
+   position: absolute;
+   top: 0;
+   left: 0;
+   display: block;
+   background: transparent;
+   pointer-events: none;
+}
+
+#canvas {
+   z-index: 25;
+}
+
+#text-canvas {
+   z-index: 30;
+}
+
+/* En modo dibujo el lienzo recibe el ratón o el dedo,
+   y las imágenes dejan de poder moverse */
+body.modo-dibujo #canvas {
+   pointer-events: auto;
+   touch-action: none;
+   cursor: crosshair;
+}
+
+body.modo-dibujo .imagen-movil,
+body.modo-dibujo .letra-movil {
+   pointer-events: none;
+}
+
+/* Contenedor de imágenes y letras */
+#elementos-canvas {
+   position: absolute;
+   top: 0;
+   left: 0;
+   z-index: 20;
+   width: 100%;
+   overflow: hidden;
+   pointer-events: none;
+}
+
+.imagen-movil,
+.letra-movil {
+   position: absolute;
+   height: auto;
+   cursor: grab;
+   user-select: none;
+   -webkit-user-select: none;
+   -webkit-user-drag: none;
+   touch-action: none;
+   pointer-events: auto;
+}
+
+.imagen-movil.agarrado,
+.letra-movil.agarrado {
+   cursor: grabbing;
+}
+
+
+/* =========================
+   3. BOTONES
+========================= */
+
+/* Enviar collage (debajo del menú) */
+#enviar {
+   position: fixed;
+   top: 75px;
+   right: var(--margen);
+   z-index: 200;
+   padding: 12px 20px;
+   border: none;
+   border-radius: 12px;
+   background-color: var(--blanco);
+   color: var(--azul);
+   font-family: var(--fuente);
+   font-size: 16px;
+   cursor: pointer;
+   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#enviar:hover {
+   background-color: var(--azul);
+   color: var(--blanco);
+}
+
+/* Botones redondos grandes: mover (abajo) y dibujar (encima) */
+#mover-btn,
+#crayon-btn {
+   position: fixed;
+   right: var(--margen);
+   z-index: 5000;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   width: var(--boton-grande);
+   height: var(--boton-grande);
+   border: none;
+   border-radius: 50%;
+   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+   cursor: pointer;
+   transition: transform 0.2s ease;
+}
+
+#mover-btn {
+   bottom: calc(var(--altura-galeria) + var(--margen));
+   background: var(--magenta);
+}
+
+#crayon-btn {
+   bottom: calc(var(--altura-galeria) + var(--margen) + var(--boton-grande) + var(--separacion));
+   background: var(--limon);
+}
+
+#mover-btn:hover,
+#crayon-btn:hover {
+   transform: scale(1.08);
+}
+
+#mover-btn.activo,
+#crayon-btn.activo {
+   outline: 3px solid var(--dark);
+}
+
+#mover-btn img,
+#crayon-btn img {
+   display: block;
+   width: 55%;
+   height: 55%;
+   object-fit: contain;
+   pointer-events: none;
+}
+
+/* Menú de herramientas (encima del lápiz) */
+#tools-menu {
+   position: fixed;
+   right: calc(var(--margen) + (var(--boton-grande) - var(--boton-herramienta)) / 2);
+   bottom: calc(var(--altura-galeria) + var(--margen) + 2 * var(--boton-grande) + 2 * var(--separacion));
+   z-index: 5001;
+   display: none;
+   flex-direction: column;
+   gap: var(--separacion);
+}
+
+#tools-menu.abierto {
+   display: flex;
+}
+
+.tool-circle {
+   position: relative;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   width: var(--boton-herramienta);
+   height: var(--boton-herramienta);
+   border: none;
+   border-radius: 50%;
+   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+   cursor: pointer;
+   transition: transform 0.2s ease;
+}
+
+.tool-circle:hover {
+   transform: scale(1.08);
+}
+
+.tool-circle.activo {
+   outline: 3px solid var(--dark);
+}
+
+#color-tool {
+   background: var(--dark);
+}
+
+#color-picker {
+   position: absolute;
+   opacity: 0;
+   pointer-events: none;
+}
+
+#text-tool {
+   background: var(--magenta);
+   color: var(--blanco);
+   font-family: var(--fuente);
+   font-size: 22px;
+}
+
+#eraser-tool {
+   background: var(--azul);
+}
+
+#eraser-tool img {
+   width: 58%;
+   height: auto;
+   pointer-events: none;
+}
+
+/* Botón + de sugerencias (abajo a la izquierda) */
+#sugerir-btn {
+   position: fixed;
+   left: var(--margen);
+   bottom: calc(var(--altura-galeria) + var(--margen));
+   z-index: 5000;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   width: var(--boton-herramienta);
+   height: var(--boton-herramienta);
+   border: none;
+   border-radius: 50%;
+   background: var(--azul);
+   color: var(--blanco);
+   font-size: 30px;
+   font-weight: bold;
+   line-height: 1;
+   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+   cursor: pointer;
+   transition: transform 0.2s ease;
+}
+
+#sugerir-btn span {
+   display: block;
+   margin-top: -2px;
+   pointer-events: none;
+}
+
+#sugerir-btn:hover {
+   transform: scale(1.08);
+}
+
+
+/* =========================
+   4. GALERÍA (fija abajo)
+========================= */
+
+#galeria-wrapper {
+   position: fixed;
+   bottom: 0;
+   left: 0;
+   z-index: 9999;
+   width: 100%;
+   height: var(--altura-galeria);
+   box-sizing: border-box;
+   border-top: 1px solid rgba(0,0,0,0.1);
+   background: var(--blanco);
+}
+
+#galeria-title {
+   padding: 10px;
+   border-bottom: 1px solid rgba(0,0,0,0.08);
+   color: var(--dark);
+   font-size: 14px;
+   font-weight: bold;
+}
+
+#galeria {
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   height: calc(var(--altura-galeria) - 40px);
+   padding: 0 10px;
+   box-sizing: border-box;
+   overflow-x: auto;
+}
+
+#galeria img {
+   height: calc(var(--altura-galeria) - 70px);
+   border-radius: 8px;
+   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+   cursor: pointer;
+   transition: transform 0.2s ease;
+}
+
+#galeria img:hover {
+   transform: scale(1.05);
+}
+
+
+/* =========================
+   5. POPUPS
+========================= */
+
+/* Collage ampliado */
+#popup {
+   position: fixed;
+   inset: 0;
+   z-index: 99999;
+   display: none;
+   justify-content: center;
+   align-items: center;
+   background: rgba(0,0,0,0.8);
+}
+
+#popup img {
+   max-width: 90%;
+   max-height: 90%;
+   border-radius: 10px;
+   background: var(--blanco);
+   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Sugerencias */
+#sugerir-popup {
+   position: fixed;
+   inset: 0;
+   z-index: 99999;
+   display: none;
+   justify-content: center;
+   align-items: center;
+   background: rgba(0,0,0,0.7);
+}
+
+#sugerir-popup-content {
+   position: relative;
+   width: 90%;
+   max-width: 420px;
+   padding: 30px;
+   box-sizing: border-box;
+   border-radius: 14px;
+   background: var(--blanco);
+   color: var(--dark);
+   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+#sugerir-close {
+   position: absolute;
+   top: 10px;
+   right: 14px;
+   border: none;
+   background: none;
+   color: var(--dark);
+   font-size: 26px;
+   line-height: 1;
+   cursor: pointer;
+}
+
+#sugerir-popup-content h3 {
+   margin: 0 0 16px 0;
+   padding-right: 24px;
+   font-size: 16px;
+}
+
+#sugerencias-form {
+   display: flex;
+   gap: 8px;
+   margin-bottom: 16px;
+}
+
+#sugerencia-input {
+   flex: 1;
+   min-width: 0;
+   padding: 8px 12px;
+   border: 1px solid rgba(0,0,0,0.15);
+   border-radius: 8px;
+   color: var(--dark);
+   font-family: var(--fuente);
+   font-size: 16px;   /* 16 px: así el iPhone no hace zoom al escribir */
+}
+
+#sugerencia-btn {
+   padding: 8px 16px;
+   border: none;
+   border-radius: 8px;
+   background-color: var(--azul);
+   color: var(--blanco);
+   font-family: var(--fuente);
+   font-size: 14px;
+   cursor: pointer;
+   transition: background-color 0.3s ease;
+}
+
+#sugerencia-btn:hover {
+   background-color: var(--magenta);
+}
+
+#sugerencias-lista {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 8px;
+   max-height: 200px;
+   overflow-y: auto;
+}
+
+.sugerencia-pill {
+   padding: 6px 14px;
+   border-radius: 20px;
+   background: var(--dark);
+   color: var(--blanco);
+   font-size: 13px;
+   white-space: nowrap;
+}
+
+
+/* =========================
+   6. PANTALLAS BAJAS (portátiles pequeños, móvil en horizontal)
+   El menú de herramientas se abre en horizontal, a la izquierda
+   del lápiz, para no chocar con «Enviar Collage».
+========================= */
+
+@media (max-height: 720px) {
+
+   #tools-menu {
+      flex-direction: row;
+      right: calc(var(--margen) + var(--boton-grande) + var(--separacion));
+      bottom: calc(var(--altura-galeria) + var(--margen) + var(--boton-grande) + var(--separacion) + (var(--boton-grande) - var(--boton-herramienta)) / 2);
+   }
+
+   /* en horizontal, la descripción sale encima del botón */
+   #tools-menu [data-tooltip]::after {
+      top: auto;
+      bottom: calc(100% + 10px);
+      right: 50%;
+      transform: translateX(50%);
+   }
+}
+
+
+/* =========================
+   7. MÓVIL (hasta 700 px de ancho)
+   - El collage ocupa una sola pantalla (sin scroll):
+     lo que se ve es exactamente lo que se envía.
+   - Botones más pequeños y galería más baja.
+========================= */
+
+@media (max-width: 700px) {
+
+   body.pagina-collage {
+      --altura-galeria: 128px;
+      --margen: 12px;
+      --boton-grande: 56px;
+      --boton-herramienta: 48px;
+      --separacion: 10px;
+
+      overflow: hidden;
+      overscroll-behavior: none;
+   }
+
+   #zona-dibujo {
+      height: calc(100vh - var(--altura-galeria));
+      height: calc(100svh - var(--altura-galeria));
+      touch-action: none;
+   }
+
+   #enviar {
+      top: 56px;
+      padding: 8px 14px;
+      font-size: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+   }
+
+   #text-tool {
+      font-size: 17px;
+   }
+
+   #sugerir-btn {
+      font-size: 24px;
+   }
+
+   #galeria-title {
+      padding: 8px 10px;
+      font-size: 13px;
+   }
+
+   #galeria {
+      height: calc(var(--altura-galeria) - 34px);
+   }
+
+   #galeria img {
+      height: calc(var(--altura-galeria) - 56px);
+   }
+
+   #sugerir-popup-content {
+      padding: 24px 18px;
+   }
+}

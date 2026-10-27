@@ -1,501 +1,453 @@
-import { initializeApp }
-    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import {
-      getFirestore,
-    collection,
-    addDoc,
-    getDocs,
-    doc,
-    updateDoc,
-    increment
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+/* =========================
+   PÁGINA 03 — MAPA COLABORATIVO
+   Mapa Leaflet + Firestore (proyecto digitalull, colección entries).
 
-  // IDIOMAS
-  import { t, aplicarTraducciones } from "./i18n.js";
+   Índice
+   1. Importaciones y Firebase
+   2. Mapa y capas
+   3. Utilidades: texto seguro, colores e iconos
+   4. Popups
+   5. Crear, guardar y cancelar pins
+   6. Likes
+   7. Zoom y teclado
+   8. Buscador de direcciones
+   9. Lista de lugares
+   10. Cargar los pins guardados
+========================= */
 
 
-  // FIREBASE  
-  const firebaseConfig = {
-    apiKey: "AIzaSyAWGffQhe1R_lSjaXGvMsLwYlTZILgoJ7s",
-    authDomain: "digitalull.firebaseapp.com",
-    projectId: "digitalull",
-    storageBucket: "digitalull.firebasestorage.app",
-    messagingSenderId: "421274305167",
-    appId: "1:421274305167:web:750093830e5718f9e426fa",
-    measurementId: "G-5NTRRTN0T0"
-  };
+/* =========================
+   1. IMPORTACIONES Y FIREBASE
+========================= */
 
-  const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
+import { t, aplicarTraducciones } from "./i18n.js";
 
-  //  MAP: centred on Barcelona
-  const map = L.map('map', { zoomControl: false }).setView([41.4036, 2.1744], 13);
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-  // ESCAPAR TEXTO DE LOS PARTICIPANTES (evita que se inserte HTML en los popups)
-  function escapeHTML(texto = "") {
-    return String(texto)
+import {
+   getFirestore,
+   collection,
+   addDoc,
+   getDocs,
+   doc,
+   updateDoc,
+   increment
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+   apiKey: "AIzaSyAWGffQhe1R_lSjaXGvMsLwYlTZILgoJ7s",
+   authDomain: "digitalull.firebaseapp.com",
+   projectId: "digitalull",
+   storageBucket: "digitalull.firebasestorage.app",
+   messagingSenderId: "421274305167",
+   appId: "1:421274305167:web:750093830e5718f9e426fa",
+   measurementId: "G-5NTRRTN0T0"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+
+/* =========================
+   2. MAPA Y CAPAS
+   Centrado en Barcelona. Botón ◐: alterna entre el mapa
+   de color (Voyager) y el de alto contraste (Light).
+========================= */
+
+const map = L.map("map", { zoomControl: false }).setView([41.4036, 2.1744], 13);
+
+const CARTO = "https://{s}.basemaps.cartocdn.com/rastertiles/{estilo}/{z}/{x}/{y}{r}.png?key=cb1_2ybc_1_8518c0a9a781f7fc341376d1";
+const opcionesCapa = { attribution: "&copy; OpenStreetMap &copy; CARTO", subdomains: "abcd", maxZoom: 20 };
+
+const capaColor = L.tileLayer(CARTO.replace("{estilo}", "voyager"), opcionesCapa).addTo(map);
+const capaContraste = L.tileLayer(CARTO.replace("{estilo}", "light_all"), opcionesCapa);
+
+let altoContraste = false;
+
+document.getElementById("contrastToggle").addEventListener("click", () => {
+   if (altoContraste) {
+      map.removeLayer(capaContraste);
+      capaColor.addTo(map);
+   } else {
+      map.removeLayer(capaColor);
+      capaContraste.addTo(map);
+   }
+   altoContraste = !altoContraste;
+});
+
+/* Los pins siempre por encima de las calles */
+map.createPane("alwaysOnTopPane");
+map.getPane("alwaysOnTopPane").style.zIndex = 650;
+map.getPane("alwaysOnTopPane").style.pointerEvents = "auto";
+
+
+/* =========================
+   3. UTILIDADES
+========================= */
+
+/* Escapar el texto de los participantes (evita que se inserte HTML) */
+function escapeHTML(texto = "") {
+   return String(texto)
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;");
-  }
+}
 
-  // PINS ABOVE STREET
-  map.createPane('alwaysOnTopPane');
-  map.getPane('alwaysOnTopPane').style.zIndex        = 650;
-  map.getPane('alwaysOnTopPane').style.pointerEvents = 'auto';
+/* Solo se aceptan colores #RGB / #RRGGBB (si no, se usa el magenta) */
+const COLOR_POR_DEFECTO = "#DA64F0";
 
-  // PENDING PINS
-  let pinId = 0;
-  const pending = {};
+function colorSeguro(color) {
+   return /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(color || "") ? color : COLOR_POR_DEFECTO;
+}
 
-  // PIN ICON
-  function createPin(color = "var(--blanco)") {
-    return L.divIcon({
+/* Icono de un pin */
+function crearIconoPin(color = "var(--blanco)") {
+   return L.divIcon({
       className: "",
-      html: `
-        <div style="
-          width: 32px;
-          height: 28px;
-        ">
-          <div style="
-            width: 14px;
-            height: 14px;
-            background: ${color};
-            transform: rotate(44.87deg);
-            border-radius: 50%;
-            box-shadow: 0 0 0 1px rgba(255,255,255,0.6);
-          "></div>
-        </div>
-      `,
-      iconSize:   [32, 32],
+      html: `<div class="pin-icono" style="background:${color};"></div>`,
+      iconSize: [32, 32],
       iconAnchor: [16, 16]
-    });
-  }
+   });
+}
 
-  // NEW-PIN POPUP
-  function newPinPopup(id) {
-    return `
-      <div style="max-width:220px;">
-        <h3 style="margin:0 0 8px 0;">${t("popup_titulo")}</h3>
-        <p>${t("popup_paso1")}</p>
-        <p>${t("popup_paso2")}</p>
-        <p>${t("popup_paso3")}</p>
-        <div style="margin-bottom:8px;">
-          <label style="font-size:12px;">${t("popup_nombre")}</label>
-          <input
-            type="text"
-            id="name-${id}"
-            placeholder="${t("popup_nombre_ph")}"
-            style="
-              width: 100%;
-              margin-top: 4px;
-              padding: 6px;
-              border-radius: 6px;
-              border: 1px solid #ccc;
-              box-sizing: border-box;
-            "
-          >
-        </div>
-        <textarea
-          id="msg-${id}"
-          style="
-            width: 100%;
-            height: 60px;
-            border-radius: 6px;
-            box-sizing: border-box;
-          "
-          placeholder="${t("popup_historia_ph")}"
-        ></textarea>
-        <div style="margin-top:8px;">
-          <label style="font-size:12px;">${t("popup_color")}</label>
-          <input type="color" id="color-${id}" value="#DA64F0">
-        </div>
-        <button class="popup-btn done-btn" onclick="window.savePin(${id})">
-          ${t("popup_hecho")}
-        </button>
-        <button class="popup-btn close-btn" onclick="window.cancelPin(${id})">
-          ${t("popup_cerrar")}
-        </button>
-      </div>
-    `;
-  }
-
-  //TOGGLE DARKNESS
-  let highContrast = false;
-const voyagerLayer = L.tileLayer(
-  'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_2ybc_1_8518c0a9a781f7fc341376d1',
-  { attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 20 }
-);
-voyagerLayer.addTo(map);
-
-const contrastLayer = L.tileLayer(
-  'https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png?key=cb1_2ybc_1_8518c0a9a781f7fc341376d1',
-  { attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 20 }
-);
-
-document.getElementById("contrastToggle").addEventListener("click", () => {
-  if (highContrast) {
-    map.removeLayer(contrastLayer);
-    voyagerLayer.addTo(map);
-  } else {
-    map.removeLayer(voyagerLayer);
-    contrastLayer.addTo(map);
-  }
-  highContrast = !highContrast;
+const iconoBusqueda = L.divIcon({
+   className: "",
+   html: `<div class="pin-busqueda"></div>`,
+   iconSize: [18, 18],
+   iconAnchor: [9, 9]
 });
 
 
-  // SAVED-PIN POPUP: W/o Author
-  function savedPinPopup(message, docId, likes = 0) {
-  return `
-    <div style="max-width:220px;">
-      ${message ? `<p style="margin:0;">${escapeHTML(message)}</p>` : `<em data-i18n="sin_mensaje">${t("sin_mensaje")}</em>`}
-      <button
-        onclick="window.addLike('${docId}', this)"
-        style="
-          margin-top: 10px;
-          background: none;
-          border: none;
-          cursor: pointer;
-          font-size: 18px;
-          padding: 0;
-        "
-      >
-        ❤️ <span>${likes}</span>
-      </button>
-    </div>
-  `;
+/* =========================
+   4. POPUPS
+========================= */
+
+/* Pin nuevo: formulario */
+function popupNuevo(id) {
+   return `
+      <div class="popup-nuevo">
+         <h3>${t("popup_titulo")}</h3>
+         <p>${t("popup_paso1")}</p>
+         <p>${t("popup_paso2")}</p>
+         <p>${t("popup_paso3")}</p>
+
+         <div class="popup-campo">
+            <label for="name-${id}">${t("popup_nombre")}</label>
+            <input type="text" id="name-${id}" placeholder="${t("popup_nombre_ph")}">
+         </div>
+
+         <textarea id="msg-${id}" placeholder="${t("popup_historia_ph")}"></textarea>
+
+         <div class="popup-campo">
+            <label for="color-${id}">${t("popup_color")}</label>
+            <input type="color" id="color-${id}" value="${COLOR_POR_DEFECTO}">
+         </div>
+
+         <button class="popup-btn done-btn" onclick="window.savePin(${id})">${t("popup_hecho")}</button>
+         <button class="popup-btn close-btn" onclick="window.cancelPin(${id})">${t("popup_cerrar")}</button>
+      </div>
+   `;
+}
+
+/* Pin guardado: mensaje y likes (el nombre nunca se muestra) */
+function popupGuardado(mensaje, docId, likes = 0) {
+   const texto = mensaje
+      ? `<p>${escapeHTML(mensaje)}</p>`
+      : `<em data-i18n="sin_mensaje">${t("sin_mensaje")}</em>`;
+
+   return `
+      <div class="popup-guardado">
+         ${texto}
+         <button class="like-btn" onclick="window.addLike('${escapeHTML(docId)}', this)">❤️ <span>${likes}</span></button>
+      </div>
+   `;
 }
 
 
-  // MAP CLICK: temporary pin
-  map.on("click", function(e) {
-    const id     = pinId++;
-    const marker = L.marker(e.latlng, {
-      icon: createPin(),
-      pane: 'alwaysOnTopPane'
-    }).addTo(map);
+/* =========================
+   5. CREAR, GUARDAR Y CANCELAR PINS
+========================= */
 
-    pending[id] = { marker, saved: false };
+let pinId = 0;
+const pendientes = {};   // pins nuevos que aún no se han guardado
 
-    marker.bindPopup(newPinPopup(id)).openPopup();
+/* Clic en el mapa: pin temporal con formulario */
+map.on("click", (e) => {
+   const id = pinId++;
+   const marker = L.marker(e.latlng, {
+      icon: crearIconoPin(),
+      pane: "alwaysOnTopPane"
+   }).addTo(map);
 
-    // Close temporary pin
-    marker.on("popupclose", () => {
-      if (!pending[id]?.saved) {
-        map.removeLayer(marker);
-      }
-      delete pending[id];
-    });
-  });
+   pendientes[id] = { marker, guardado: false };
 
-  // SAVE PIN: Save to Firestone
-  window.savePin = async function(id) {
-    const entry = pending[id];
-    if (!entry) return;
+   marker.bindPopup(popupNuevo(id)).openPopup();
 
-    const { marker } = entry;
+   // si se cierra sin guardar, el pin desaparece
+   marker.on("popupclose", () => {
+      if (!pendientes[id]?.guardado) map.removeLayer(marker);
+      delete pendientes[id];
+   });
+});
 
-    const colorInput = document.getElementById(`color-${id}`);
-    const msgInput   = document.getElementById(`msg-${id}`);
-    const nameInput  = document.getElementById(`name-${id}`);
+/* Guardar en Firestore */
+window.savePin = async function (id) {
+   const pendiente = pendientes[id];
+   if (!pendiente) return;
 
-    const color   = colorInput ? colorInput.value : "#ff4fd8";
-    const message = msgInput   ? msgInput.value   : "";
-    const author  = nameInput  ? nameInput.value  : "";
+   const { marker } = pendiente;
+   const { lat, lng } = marker.getLatLng();
 
-    // Mark as saved
-    pending[id].saved = true;
+   const color = colorSeguro(document.getElementById(`color-${id}`)?.value);
+   const message = document.getElementById(`msg-${id}`)?.value || "";
+   const author = document.getElementById(`name-${id}`)?.value || "";
 
-    marker.setIcon(createPin(color));
+   pendiente.guardado = true;
+   marker.setIcon(crearIconoPin(color));
+   marker.closePopup();
+   marker.unbindPopup();
 
-    marker.unbindPopup();
-    marker.closePopup();
-
-    // Save to Firestore
-    try {
+   try {
       const docRef = await addDoc(collection(db, "entries"), {
-        lat:       marker.getLatLng().lat,
-        lng:       marker.getLatLng().lng,
-        author:    author,
-        message:   message,
-        color:     color,
-        likes:     0,
-        createdAt: Date.now()
+         lat,
+         lng,
+         author,
+         message,
+         color,
+         likes: 0,
+         createdAt: Date.now()
       });
 
       // popup con el id real, para que el like funcione en el pin recién creado
-      marker.bindPopup(savedPinPopup(message, docRef.id, 0));
+      marker.bindPopup(popupGuardado(message, docRef.id, 0));
+      anadirALista(message, marker, [lat, lng]);
 
-      // añadir el nuevo lugar a la lista lateral
-      anadirALista(message, marker, [marker.getLatLng().lat, marker.getLatLng().lng]);
-
-       alert(t("pin_guardado"));
-    } catch (err) {
-      console.error("Error al guardar el pin en Firestore:", err);
+      alert(t("pin_guardado"));
+   } catch (err) {
+      console.error("Error al guardar el pin:", err);
       map.removeLayer(marker);
       alert(t("pin_error"));
-    }
-  };
+   }
+};
 
-  // CANCEL PIN 
-  window.cancelPin = function(id) {
-    const entry = pending[id];
-    if (!entry) return;
-    map.removeLayer(entry.marker);
-    delete pending[id];
-  };
+/* Cancelar */
+window.cancelPin = function (id) {
+   const pendiente = pendientes[id];
+   if (!pendiente) return;
+   map.removeLayer(pendiente.marker);
+   delete pendientes[id];
+};
 
-  // ADD LIKES
-  window.addLike = async function(docId, btn) {
-    console.log("docId recibido:", docId);
-    btn.disabled = true;
-    const count  = btn.querySelector("span");
-    count.textContent = Number(count.textContent) + 1;
 
-    try {
-      const ref = doc(db, "entries", docId);
-      console.log("ref creada:", ref);
-      await updateDoc(ref, {
-        likes: increment(1)
-      });
-      console.log("Like guardado OK");
-    } catch (err) {
-      console.error("Like error completo:", err);
-      console.error("Código:", err.code);
-      console.error("Mensaje:", err.message);
-    }
-  };
+/* =========================
+   6. LIKES
+========================= */
 
-  
-  // ZOOM CONTROLS 
-  document.getElementById("zoomIn").onclick  = () => map.zoomIn();
-  document.getElementById("zoomOut").onclick = () => map.zoomOut();
+window.addLike = async function (docId, boton) {
+   boton.disabled = true;
+   const contador = boton.querySelector("span");
+   contador.textContent = Number(contador.textContent) + 1;
 
-  document.getElementById("map").addEventListener("keydown", (e) => {
-  const tag = e.target.tagName;
-  if (tag === "INPUT" || tag === "TEXTAREA") return;
+   try {
+      await updateDoc(doc(db, "entries", docId), { likes: increment(1) });
+   } catch (err) {
+      console.error("Error al guardar el like:", err);
+   }
+};
 
-  switch (e.key) {
-    case "+":
-    case "=":
-      map.zoomIn();
-      break;
-    case "-":
-    case "_":
-      map.zoomOut();
-      break;
-    case "ArrowUp":
-    case "w":
-    case "W":
-      map.panBy([0, -50]);
-      break;
-    case "ArrowDown":
-    case "s":
-    case "S":
-      map.panBy([0, 50]);
-      break;
-    case "ArrowLeft":
-    case "a":
-    case "A":
-      map.panBy([-50, 0]);
-      break;
-    case "ArrowRight":
-    case "d":
-    case "D":
-      map.panBy([50, 0]);
-      break;
-  }
+
+/* =========================
+   7. ZOOM Y TECLADO
+   + / −, flechas y WASD
+========================= */
+
+document.getElementById("zoomIn").addEventListener("click", () => map.zoomIn());
+document.getElementById("zoomOut").addEventListener("click", () => map.zoomOut());
+
+const TECLAS = {
+   "+": () => map.zoomIn(),
+   "=": () => map.zoomIn(),
+   "-": () => map.zoomOut(),
+   "_": () => map.zoomOut(),
+   "ArrowUp": () => map.panBy([0, -50]),
+   "w": () => map.panBy([0, -50]),
+   "ArrowDown": () => map.panBy([0, 50]),
+   "s": () => map.panBy([0, 50]),
+   "ArrowLeft": () => map.panBy([-50, 0]),
+   "a": () => map.panBy([-50, 0]),
+   "ArrowRight": () => map.panBy([50, 0]),
+   "d": () => map.panBy([50, 0])
+};
+
+document.getElementById("map").addEventListener("keydown", (e) => {
+   const etiqueta = e.target.tagName;
+   if (etiqueta === "INPUT" || etiqueta === "TEXTAREA") return;
+
+   const accion = TECLAS[e.key.length === 1 ? e.key.toLowerCase() : e.key];
+   if (accion) accion();
 });
 
-  // HIDE LOGO ON SCROLL
-  window.addEventListener("scroll", () => {
-      const logo = document.querySelector(".logo");
-      if (window.scrollY > 50) {
-          logo.style.opacity = "0";
-          logo.style.pointerEvents = "none";
-      } else {
-          logo.style.opacity = "1";
-          logo.style.pointerEvents = "auto";
-      }
-  });
-  // SEARCH AUTOCOMPLETE
-  const searchInput   = document.getElementById("searchBox");
-  const suggestionBox = document.getElementById("suggestions");
-  let debounceTimer;
 
-  // SELECT BY ENTER
-  searchInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      const first = suggestionBox.querySelector(".suggestion");
-      if (first) first.click();
-    }
-  });
+/* =========================
+   8. BUSCADOR DE DIRECCIONES
+   Prioridad: Barcelona ciudad → Cataluña → resto del mundo (Nominatim)
+========================= */
 
- searchInput.addEventListener("input", () => {
-  clearTimeout(debounceTimer);
+const searchInput = document.getElementById("searchBox");
+const suggestionBox = document.getElementById("suggestions");
+let temporizador;
+let marcadorBusqueda = null;
 
-  const query = searchInput.value;
-  if (query.length < 3) {
-    suggestionBox.style.display = "none";
-    return;
-  }
+const NOMINATIM = "https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&accept-language=ca,es";
+const ZONA_BCN = "&viewbox=2.052,41.469,2.228,41.320&bounded=0";
+const ZONA_CAT = "&viewbox=0.15,42.9,3.4,40.5&bounded=0";
 
-  debounceTimer = setTimeout(async () => {
-    try {
-      // Barcelona city bounding box (tight)
-      const bcnRes = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(query)}&viewbox=2.052,41.469,2.228,41.320&bounded=0&accept-language=ca,es&limit=5`
-      );
-      const bcnData = await bcnRes.json();
+async function buscar(texto, zona = "") {
+   const res = await fetch(`${NOMINATIM}&q=${encodeURIComponent(texto)}${zona}`);
+   return res.json();
+}
 
-      // Catalonia-wide bounding box (broader bias)
-      const catRes = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(query)}&viewbox=0.15,42.9,3.4,40.5&bounded=0&accept-language=ca,es&limit=5`
-      );
-      const catData = await catRes.json();
+function irALugar(lugar) {
+   if (marcadorBusqueda) map.removeLayer(marcadorBusqueda);
 
-      // Global fallback
-      const globalRes = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(query)}&limit=5`
-      );
-      const globalData = await globalRes.json();
+   map.setView([lugar.lat, lugar.lon], 16);
+   searchInput.value = lugar.display_name;
+   suggestionBox.style.display = "none";
 
-      // Tier 1: results whose city/town is literally "Barcelona"
-      const isBarcelonaCity = (p) =>
-        p.address && (p.address.city === "Barcelona" || p.address.town === "Barcelona");
+   marcadorBusqueda = L.marker([lugar.lat, lugar.lon], { icon: iconoBusqueda, pane: "alwaysOnTopPane" })
+      .addTo(map)
+      .bindPopup(`<div style="font-size:13px;">${escapeHTML(lugar.display_name)}</div>`)
+      .openPopup();
+}
 
-      const tier1 = bcnData.filter(isBarcelonaCity);
-      const tier2 = catData.filter(p => !tier1.some(t => t.place_id === p.place_id));
-      const tier3 = globalData.filter(p =>
-        !tier1.some(t => t.place_id === p.place_id) &&
-        !tier2.some(t => t.place_id === p.place_id)
-      );
+searchInput.addEventListener("input", () => {
+   clearTimeout(temporizador);
 
-      const merged = [...tier1, ...tier2, ...tier3].slice(0, 5);
-
-      suggestionBox.innerHTML     = "";
-      suggestionBox.style.display = "block";
-
-      merged.forEach(place => {
-        const div     = document.createElement("div");
-        div.className = "suggestion";
-        div.innerText = place.display_name;
-
-        div.onclick = () => {
-          if (window._searchMarker) {
-            map.removeLayer(window._searchMarker);
-          }
-
-          map.setView([place.lat, place.lon], 16);
-          searchInput.value           = place.display_name;
-          suggestionBox.style.display = "none";
-
-          window._searchMarker = L.marker([place.lat, place.lon], {
-            icon: L.divIcon({
-              className: "",
-              html: `
-                <div style="
-                  width: 18px;
-                  height: 18px;
-                  background: var(--magenta);
-                  border: 3px solid var(--blanco);
-                  border-radius: 50%;
-                  box-shadow: 0 0 0 3px var(--magenta);
-                "></div>
-              `,
-              iconSize:   [18, 18],
-              iconAnchor: [9, 9]
-            }),
-            pane: 'alwaysOnTopPane'
-          })
-          .addTo(map)
-          .bindPopup(`<div style="font-size:13px;">${escapeHTML(place.display_name)}</div>`)
-          .openPopup();
-        };
-
-        suggestionBox.appendChild(div);
-      });
-
-    } catch (err) {
-      console.error("Nominatim search error:", err);
-    }
-  }, 300);
-});                                     
-
-  // HIDE SUGGESTIONS
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest("#searchBox") && !e.target.closest("#suggestions")) {
+   const texto = searchInput.value;
+   if (texto.length < 3) {
       suggestionBox.style.display = "none";
-    }
-  });
+      return;
+   }
 
-  searchInput.addEventListener("focus", () => {
-    if (suggestionBox.innerHTML.trim() !== "") {
-      suggestionBox.style.display = "block";
-    }
-  });
-
-  // AÑADIR UN LUGAR A LA LISTA LATERAL
-  function anadirALista(message, marker, latlng) {
-    const listContainer = document.getElementById("pinList");
-    const item = document.createElement("div");
-    item.className = "pin-item";
-    if (message) {
-      item.textContent = message.slice(0, 60);   // aportación del participante: no se traduce
-    } else {
-      item.dataset.i18n = "sin_mensaje";
-      item.textContent  = t("sin_mensaje");
-    }
-    item.onclick = () => {
-      map.setView(latlng, 16);
-      marker.openPopup();
-    };
-    listContainer.appendChild(item);
-  }
-
-  // LOAD PINS FIRESTONE
-      async function loadPins() {
+   temporizador = setTimeout(async () => {
       try {
-        const snapshot = await getDocs(collection(db, "entries"));
-        const listContainer = document.getElementById("pinList");
-        listContainer.innerHTML = `
-  <button class="close-list-btn" data-i18n-aria="lista_cerrar_aria" data-i18n-tooltip="lista_cerrar">✕</button>
-  <h3 data-i18n="lista_titulo"></h3>
-  <p class="list-description" data-i18n="lista_descripcion"></p>
-`;
-        aplicarTraducciones(listContainer);
+         const [bcn, cat, global] = await Promise.all([
+            buscar(texto, ZONA_BCN),
+            buscar(texto, ZONA_CAT),
+            buscar(texto)
+         ]);
 
-        snapshot.forEach((docSnap) => {
-          const data = docSnap.data();
+         const esBarcelona = (p) => p.address && (p.address.city === "Barcelona" || p.address.town === "Barcelona");
+         const yaIncluido = (lista, p) => lista.some(otro => otro.place_id === p.place_id);
 
-          if (!data.lat || !data.lng) return;
+         const nivel1 = bcn.filter(esBarcelona);
+         const nivel2 = cat.filter(p => !yaIncluido(nivel1, p));
+         const nivel3 = global.filter(p => !yaIncluido(nivel1, p) && !yaIncluido(nivel2, p));
 
-          const marker = L.marker(
-            [data.lat, data.lng],
-            { icon: createPin(data.color || "#ff4fd8"), pane: 'alwaysOnTopPane' }
-          ).addTo(map);
+         const resultados = [...nivel1, ...nivel2, ...nivel3].slice(0, 5);
 
-          marker.bindPopup(savedPinPopup(data.message, docSnap.id, data.likes || 0));
+         suggestionBox.innerHTML = "";
+         suggestionBox.style.display = resultados.length ? "block" : "none";
 
-          anadirALista(data.message, marker, [data.lat, data.lng]);
-        });
+         resultados.forEach(lugar => {
+            const div = document.createElement("div");
+            div.className = "suggestion";
+            div.textContent = lugar.display_name;
+            div.addEventListener("click", () => irALugar(lugar));
+            suggestionBox.appendChild(div);
+         });
 
       } catch (err) {
-        console.error("Firestore load error:", err);
+         console.error("Error en el buscador:", err);
       }
-    }
-    loadPins();
-
-    document.getElementById("listToggle").addEventListener("click", () => {
-      const list = document.getElementById("pinList");
-      list.style.display = list.style.display === "none" ? "block" : "none";
-    });
-
-    document.addEventListener("click", (e) => {
-  if (e.target && e.target.classList.contains("close-list-btn")) {
-    document.getElementById("pinList").style.display = "none";
-  }
+   }, 300);
 });
+
+/* Enter: primer resultado */
+searchInput.addEventListener("keydown", (e) => {
+   if (e.key === "Enter") suggestionBox.querySelector(".suggestion")?.click();
+});
+
+/* Mostrar u ocultar las sugerencias */
+searchInput.addEventListener("focus", () => {
+   if (suggestionBox.innerHTML.trim() !== "") suggestionBox.style.display = "block";
+});
+
+document.addEventListener("click", (e) => {
+   if (!e.target.closest("#searchBox") && !e.target.closest("#suggestions")) {
+      suggestionBox.style.display = "none";
+   }
+});
+
+
+/* =========================
+   9. LISTA DE LUGARES (panel lateral ☰)
+========================= */
+
+const listaLugares = document.getElementById("pinList");
+
+listaLugares.innerHTML = `
+   <button class="close-list-btn" data-i18n-aria="lista_cerrar_aria" data-i18n-tooltip="lista_cerrar">✕</button>
+   <h3 data-i18n="lista_titulo"></h3>
+   <p class="list-description" data-i18n="lista_descripcion"></p>
+`;
+aplicarTraducciones(listaLugares);
+
+function anadirALista(mensaje, marker, latlng) {
+   const item = document.createElement("div");
+   item.className = "pin-item";
+
+   if (mensaje) {
+      item.textContent = mensaje.slice(0, 60);   // aportación del participante: no se traduce
+   } else {
+      item.dataset.i18n = "sin_mensaje";
+      item.textContent = t("sin_mensaje");
+   }
+
+   item.addEventListener("click", () => {
+      map.setView(latlng, 16);
+      marker.openPopup();
+      if (window.matchMedia("(max-width: 700px)").matches) listaLugares.classList.remove("abierto");
+   });
+
+   listaLugares.appendChild(item);
+}
+
+document.getElementById("listToggle").addEventListener("click", () => {
+   listaLugares.classList.toggle("abierto");
+});
+
+listaLugares.querySelector(".close-list-btn").addEventListener("click", () => {
+   listaLugares.classList.remove("abierto");
+});
+
+
+/* =========================
+   10. CARGAR LOS PINS GUARDADOS
+========================= */
+
+async function cargarPins() {
+   try {
+      const snapshot = await getDocs(collection(db, "entries"));
+
+      snapshot.forEach((docSnap) => {
+         const data = docSnap.data();
+         if (!data.lat || !data.lng) return;
+
+         const marker = L.marker([data.lat, data.lng], {
+            icon: crearIconoPin(colorSeguro(data.color)),
+            pane: "alwaysOnTopPane"
+         }).addTo(map);
+
+         marker.bindPopup(popupGuardado(data.message, docSnap.id, data.likes || 0));
+         anadirALista(data.message, marker, [data.lat, data.lng]);
+      });
+
+   } catch (err) {
+      console.error("Error al cargar los pins:", err);
+   }
+}
+
+cargarPins();
