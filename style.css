@@ -10,7 +10,8 @@
    4. Botones de entrada
    5. Descripciones al pasar el ratón
    6. Página 01 — Inicio
-   7. Móvil
+   7. Logos institucionales
+   8. Móvil
 ========================= */
 
 
@@ -375,7 +376,30 @@ body {
 
 
 /* =========================
-   7. MÓVIL (hasta 700 px de ancho)
+   7. LOGOS INSTITUCIONALES (portada, abajo a la derecha)
+========================= */
+
+#logos {
+   position: fixed;
+   right: 20px;
+   bottom: 20px;
+   z-index: 60;
+   display: flex;
+   flex-direction: column;
+   align-items: flex-end;
+   gap: 12px;
+}
+
+#logos img {
+   display: block;
+   width: auto;
+   max-width: 150px;
+   max-height: 60px;
+}
+
+
+/* =========================
+   8. MÓVIL (hasta 700 px de ancho)
 ========================= */
 
 @media (max-width: 700px) {
@@ -467,5 +491,16 @@ body {
       width: 40px;
       height: 40px;
       font-size: 18px;
+   }
+
+   /* Logos: al final de la página, no fijos (no tapan el texto) */
+   #logos {
+      position: static;
+      padding: 0 20px 30px 20px;
+   }
+
+   #logos img {
+      max-width: 120px;
+      max-height: 48px;
    }
 }
